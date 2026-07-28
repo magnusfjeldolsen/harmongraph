@@ -4,7 +4,44 @@ A browser tool for working out what chord is being played, how it is voiced, and
 
 **Live:** https://magnusfjeldolsen.github.io/harmongraph/
 
-Load an audio file or record from the mic, fence a segment on the waveform, and analyze. Everything runs on your device — no upload, no server, no build step. One HTML file, no dependencies.
+Load an audio file or record from the mic, fence a segment on the waveform, and analyze. Everything runs on your device — no upload, no build step, no dependencies. Plain HTML, CSS and ES modules, served as static files.
+
+---
+
+## Running it locally
+
+The page has to be **served over http**, not opened as a `file://` path — browsers refuse to load ES modules from `file://`. From the repo root:
+
+```
+python -m http.server 8000
+```
+
+then open <http://localhost:8000>. Any static server does; this is not a build step, and nothing is compiled or installed.
+
+Mic capture already required this: `getUserMedia` is only available on a secure origin, which means `https` or `localhost`. File loading, analysis and playback work from any served origin.
+
+GitHub Pages serves the repo root as-is (hence the `.nojekyll`), so the deployed copy needs no special handling.
+
+## Layout
+
+```
+index.html          markup, one <link> and one <script type="module">
+css/app.css
+js/main.js          entry point, cross-module wiring
+js/state.js         S, $, ac(), setStatus()
+js/pitch.js         note names, equal-temperament frequencies
+js/chords.js        the 26 chord qualities, naming, slash detection
+js/analysis.js      the analysis pipeline, A4 detection
+js/audio.js         loading, transport, mic capture, isolation, resynthesis
+js/dsp/fft.js       FFT, STFT/ISTFT
+js/dsp/hpss.js      harmonic/percussive separation
+js/dsp/nnls.js      log-frequency front end, note dictionary, FISTA solver
+js/ui/canvas.js     canvas plumbing, DPR fitting, the level colour ramp
+js/ui/waveform.js   waveform drawing and view geometry
+js/ui/keyboard.js   88-key map
+js/ui/spectrum.js   log spectrum with the NNLS reconstruction
+js/ui/panels.js     note selection and the result panel
+```
 
 ---
 

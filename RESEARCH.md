@@ -118,6 +118,7 @@ Low score = you're probably looking at a ghost. Shown as the violet bar and the 
 - **Bass below ~E2** is at the resolution floor. The 32768 window helps but needs ≥1.5 s of steady audio.
 - **Enharmonic spelling** is key-dependent (A♯ vs B♭). The prototype always picks sharps; correct spelling needs key context.
 - Averaging over a segment where the chord *changes* gives mush. Fence tightly.
+- **Plucked strings read as almost-all-overtones.** Reported from real guitar use, 2026-07-28. This one is *not* inherent — see §10.
 
 ---
 
@@ -203,6 +204,58 @@ The prototype runs on the main thread with `await yield_()` between pipeline sta
 **Phase 3 — accuracy.** Add Basic Pitch as a cross-check. Add a **Viterbi/HMM smoother** across consecutive segments — chord transitions have strong priors and this is where Chordino gets its remaining accuracy. Port the NNLS and HPSS inner loops to Rust/wasm.
 
 **Phase 4 — separation.** Server-side `htdemucs_6s`, cached stems, per-stem analysis in the client.
+
+---
+
+## 10. Open problem — plucked strings read as almost-all-overtones
+
+Logged 2026-07-28 from real guitar use, not from the synthetic fixtures. Nothing here is implemented yet; this is the diagnosis and the plan.
+
+### Symptom
+
+Play a guitar chord: nearly every detected note comes back with a low **P(real)**, i.e. flagged violet as a likely overtone. Play a *single* note: several notes are reported, and the user has to already know that only the lowest one is real. The confidence dimension, which is supposed to remove guesswork, is instead where the guesswork moved.
+
+### Why it happens — two independent causes
+
+**(a) Guitar voicings are built out of the harmonic series, so P(real) is answering the wrong question.**
+
+$P_\text{real}$ (§4) measures: *of the energy at this note's fundamental bin, how much is its own template versus other active notes' partials landing there.* Open E is E2 B2 E3 G♯3 B3 E4. E2's partials are E3 (2f), B3 (3f), E4 (4f) — three of the six notes you actually played sit exactly on the bass note's series. The metric reports genuine spectral ambiguity, and it is not wrong to do so. But the UI presents that number as *doubt about whether you played the note*, and those are different claims. On piano fixtures the two mostly coincide; on guitar they come apart badly, because fourths-and-octaves voicings are maximally nested.
+
+**(b) The dictionary does not look like a plucked string, so the fit invents notes.**
+
+`buildDict` places partial $h$ at exactly $h f_0$ with amplitude $s^{h-1}$ — a perfectly harmonic series with one global geometric decay from the *Timbre* slider. A real plucked string violates both halves:
+
+- **Stiffness.** $f_h = h f_0\sqrt{1+Bh^2}$. At 3 bins/semitone (33.3 cents/bin) with the template's ±50-cent raised-cosine spread, modest $B$ is absorbed — but the high partials still drift out of their bins. Note the irony that §6 already models exactly this for *resynthesis* and §4 does not model it for *analysis*.
+- **Pluck position, which matters more.** A string plucked at fraction $\beta$ of its length has partial amplitudes $\propto \frac{1}{h^2}\sin(\pi h\beta)$ — a comb, with hard nulls at every $h = n/\beta$. Pluck at 1/5 and the 5th partial vanishes. Real guitar spectra have deep notches and are nowhere near a geometric decay.
+
+A single template cannot fit a notched series, and NNLS has exactly one way to absorb the residual: **switch on more notes.** That is the ghost stack. It predicts the observed asymmetry — brighter, richer, more sharply plucked notes generate more ghosts — and it explains why one note comes back as several.
+
+### The evidence currently being thrown away
+
+Stage 2 of `analyze()` computes a multi-frame STFT and then **averages the magnitude spectra across all frames** before fitting once. That discards the strongest available cue for this exact problem:
+
+> Partials of one string share a single amplitude envelope. Separately plucked notes do not.
+
+A strum spreads onsets over 20–40 ms, and every string decays at its own rate. A ghost note's activation trajectory tracks its parent's almost perfectly; a real note has its own onset and its own decay slope. The frames are already computed — the evidence is averaged away one line before it could be used.
+
+### Candidate fixes, ranked by value per unit of work
+
+| # | Fix | Effect | Cost |
+|---|---|---|---|
+| 1 | **Name the parent.** In the $P_\text{real}$ loop, record $\arg\max_j$ of the competing contribution, not just the sum. Display "E4 — 84% explained by E2, 4th partial" instead of a bare percentage. | Removes the guesswork by *explaining* it, without touching the DSP. The user can judge a named claim; they cannot judge a number. | Hours. The quantity is already computed and discarded. |
+| 2 | **Fit the timbre instead of assuming it.** Per-note inharmonicity $B$, and 2–3 basis templates per key spanning plausible pluck positions rather than one geometric decay. | Attacks cause (b) at the source: fewer ghosts activated at all, rather than ghosts detected after the fact. | Moderate. Widens the dictionary; watch NNLS conditioning and runtime. |
+| 3 | **Temporal separation.** Stop averaging. Fit per frame over the surviving candidates, build an activation envelope per note, score independence against the putative parent (envelope correlation + onset offset). | The principled fix, and the biggest jump. Directly separates "real note that happens to sit on a harmonic" from "partial of the note below" — which (a) shows is otherwise genuinely undecidable from one spectrum. | Largest. ~280 ms becomes ~1–2 s per segment; restricting to post-stage-5 candidates keeps it bounded. |
+| 4 | **Tell it what instrument it is.** A source preset (guitar / piano / voice / organ) setting decay, $B$, pluck-comb basis and expected voicing priors together. | Cheap accuracy, and honest: inferring all of this blind from one segment is strictly harder than being told. | Small, once 2 exists. |
+
+Fix 1 is worth doing regardless of the others, since it improves the readout even when the underlying detection is correct. Fixes 2 and 3 are complementary, not alternatives — 2 reduces ghost *creation*, 3 improves ghost *rejection*.
+
+### Why the fixtures missed this
+
+The 90% / 96% / 14-of-14 figures in §4 were measured on **synthetic piano-like spectra** — 16 partials, harmonic-with-mild-inharmonicity, smooth decay. That is close to what `buildDict` assumes, so the test set cannot expose a template-mismatch failure. It is a fixture set that agrees with the model rather than probing it.
+
+**Before touching any of the above:** build a guitar fixture set — real recordings, known voicings, several pluck positions and pickup settings, both single notes and open chords. Record the current numbers on it first. Otherwise there is no way to tell an improvement from a re-tune, and §4's headline figures will keep describing a case nobody plays.
+
+The metric to move is not overall recall. It is: **on a single plucked note, how often is exactly one note reported** — and on a known chord, the separation between $P_\text{real}$ for played notes and for ghosts, which on piano fixtures was 72% vs 31% and on guitar is visibly collapsing.
 
 ---
 

@@ -690,7 +690,7 @@ const S={
   iso:'full', isoBufs:{},
   ana:null, hpss:true, thr:0.12, a4:440, fftN:16384, decay:0.72,
   GATE:0.08, NMS:1.5, voice:'piano', useDyn:true, rows:null,
-  rec:null, recChunks:[], recStream:null
+  rec:null
 };
 
 function ac(){
@@ -968,31 +968,59 @@ $('#drop').addEventListener('drop',async e=>{
   ac(); await loadArrayBuffer(await f.arrayBuffer(),f.name);
 });
 
+/* Mic capture writes raw PCM straight into an AudioBuffer. MediaRecorder would mean
+   an Opus/AAC round-trip — lossy in exactly the high partials the NNLS fit reads,
+   and a decode step that can fail after the take is already gone. */
+function micError(err){
+  const n=(err&&err.name)||String(err);
+  if(location.protocol==='file:')
+    return 'Mic access is blocked on file:// pages ('+n+'). Open the hosted copy at '
+      +'magnusfjeldolsen.github.io/harmongraph, or serve this folder over http://localhost.';
+  if(n==='NotAllowedError'||n==='SecurityError')
+    return 'Microphone permission denied. Allow it for this site from the address bar, then try again.';
+  if(n==='NotFoundError'||n==='OverconstrainedError') return 'No microphone found on this device.';
+  if(n==='NotReadableError') return 'The microphone is busy — another app or tab is holding it.';
+  return 'Microphone failed to start: '+n;
+}
+function stopRec(){
+  const R=S.rec; if(!R) return; S.rec=null;
+  R.node.onaudioprocess=null;
+  try{ R.src.disconnect(); R.node.disconnect(); R.mute.disconnect(); }catch(e){}
+  R.stream.getTracks().forEach(t=>t.stop());
+  $('#recBtn').classList.remove('armed'); $('#recBtn').textContent='● Record from mic';
+  if(!R.n){ setStatus('Nothing was captured — the mic delivered no audio.',false,true); return; }
+  const b=R.ctx.createBuffer(1,R.n,R.ctx.sampleRate), d=b.getChannelData(0);
+  let o=0; for(const ch of R.chunks){ d.set(ch,o); o+=ch.length; }
+  setBuffer(b,'mic recording');
+}
 $('#recBtn').onclick=async()=>{
-  if(S.rec&&S.rec.state==='recording'){ S.rec.stop(); return; }
+  if(S.rec){ stopRec(); return; }
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    setStatus(micError({name:'unsupported'}),false,true); return;
+  }
+  let stream=null;
   try{
-    ac();
-    const stream=await navigator.mediaDevices.getUserMedia({audio:{
+    const c=ac();
+    stream=await navigator.mediaDevices.getUserMedia({audio:{
       echoCancellation:false, noiseSuppression:false, autoGainControl:false, channelCount:1
     }});
-    S.recStream=stream;
-    let mt='';
-    for(const t of ['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus'])
-      if(window.MediaRecorder&&MediaRecorder.isTypeSupported(t)){ mt=t; break; }
-    const r=new MediaRecorder(stream, mt?{mimeType:mt,audioBitsPerSecond:192000}:undefined);
-    S.recChunks=[];
-    r.ondataavailable=e=>{ if(e.data.size) S.recChunks.push(e.data); };
-    r.onstop=async()=>{
-      stream.getTracks().forEach(t=>t.stop());
-      $('#recBtn').classList.remove('armed'); $('#recBtn').textContent='● Record from mic';
-      const blob=new Blob(S.recChunks,{type:mt||'audio/webm'});
-      await loadArrayBuffer(await blob.arrayBuffer(),'mic recording');
+    const src=c.createMediaStreamSource(stream);
+    const node=c.createScriptProcessor(4096,1,1);
+    const mute=c.createGain(); mute.gain.value=0;   // a ScriptProcessor only pulls once routed to the destination
+    const R={ctx:c,stream,src,node,mute,chunks:[],n:0};
+    node.onaudioprocess=e=>{
+      const d=e.inputBuffer.getChannelData(0);
+      R.chunks.push(new Float32Array(d)); R.n+=d.length;
+      if(R.chunks.length%8===0)
+        setStatus('Recording '+(R.n/c.sampleRate).toFixed(1)+'s — press again to stop.',true);
     };
-    r.start(); S.rec=r;
+    src.connect(node); node.connect(mute); mute.connect(c.destination);
+    S.rec=R;
     $('#recBtn').classList.add('armed'); $('#recBtn').textContent='■ Stop recording';
     setStatus('Recording — mic processing disabled for musical accuracy.',true);
   }catch(err){
-    setStatus('Microphone blocked. Allow mic access, and note that iOS needs an https page.',false,true);
+    if(stream) stream.getTracks().forEach(t=>t.stop());
+    setStatus(micError(err),false,true);
   }
 };
 

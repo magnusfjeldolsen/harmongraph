@@ -984,7 +984,7 @@ function micError(err){
 }
 function stopRec(){
   const R=S.rec; if(!R) return; S.rec=null;
-  R.node.onaudioprocess=null;
+  clearInterval(R.timer); R.node.onaudioprocess=null;
   try{ R.src.disconnect(); R.node.disconnect(); R.mute.disconnect(); }catch(e){}
   R.stream.getTracks().forEach(t=>t.stop());
   $('#recBtn').classList.remove('armed'); $('#recBtn').textContent='● Record from mic';
@@ -1008,13 +1008,12 @@ $('#recBtn').onclick=async()=>{
     const node=c.createScriptProcessor(4096,1,1);
     const mute=c.createGain(); mute.gain.value=0;   // a ScriptProcessor only pulls once routed to the destination
     const R={ctx:c,stream,src,node,mute,chunks:[],n:0};
-    node.onaudioprocess=e=>{
+    node.onaudioprocess=e=>{                        // keep this callback cheap — a slow one drops input
       const d=e.inputBuffer.getChannelData(0);
       R.chunks.push(new Float32Array(d)); R.n+=d.length;
-      if(R.chunks.length%8===0)
-        setStatus('Recording '+(R.n/c.sampleRate).toFixed(1)+'s — press again to stop.',true);
     };
     src.connect(node); node.connect(mute); mute.connect(c.destination);
+    R.timer=setInterval(()=>setStatus('Recording '+(R.n/c.sampleRate).toFixed(1)+'s — press again to stop.',true),250);
     S.rec=R;
     $('#recBtn').classList.add('armed'); $('#recBtn').textContent='■ Stop recording';
     setStatus('Recording — mic processing disabled for musical accuracy.',true);

@@ -5,33 +5,19 @@
    note threshold moves — no refit needed. */
 import {$,S,clamp,noteOn} from '../state.js';
 import {midiName,midiFreq} from '../pitch.js';
-import {NOTE_LO,NN_COUNT} from '../dsp/nnls.js';
+import {NOTE_LO} from '../dsp/nnls.js';
+import {selectNotes} from '../analyzeSegment.js';
 import {idChord,chordLabel} from '../chords.js';
 import {fitCanvas,dynColor} from './canvas.js';
 import {drawKeys} from './keyboard.js';
 import {drawSpec} from './spectrum.js';
 import {buildIso,startPlay,clearSynthCache,restartSynth} from '../audio.js';
 
+/* the same selection analyzeSegment() applies, re-run live so the
+   threshold slider needs no refit */
 function selectedNotes(){
   const A=S.ana; if(!A) return [];
-  // 1. activation threshold  2. must have energy at its own fundamental
-  const pass=new Float64Array(NN_COUNT);
-  for(let i=0;i<NN_COUNT;i++)
-    if(A.detN[i]>=S.thr && (!A.evid || A.evid[i]>=S.GATE)) pass[i]=A.detN[i];
-  // 3. non-maximum suppression: adjacent semitones in the bass are usually
-  //    FFT smearing, not a real minor 2nd — keep one unless they are comparable
-  const out=[];
-  for(let i=0;i<NN_COUNT;i++){
-    if(!pass[i]) continue;
-    let beaten=false;
-    for(const d of [-1,1]){ const j=i+d;
-      if(j>=0&&j<NN_COUNT&&pass[j]>pass[i]*S.NMS) beaten=true; }
-    if(!beaten) out.push(i);
-  }
-  out.sort((a,b)=>A.detN[b]-A.detN[a]);
-  const keep=out.slice(0,12);
-  keep.sort((a,b)=>a-b);
-  return keep;
+  return selectNotes(A.detN,A.evid,S.thr,S.GATE,S.NMS,12);
 }
 function renderResult(){
   const A=S.ana; if(!A) return;

@@ -3,9 +3,8 @@
    plus the concert-pitch estimator that shares its slicing.
    ============================================================ */
 import {$,S,clamp,setStatus,yield_} from './state.js';
-import {stft,istft,magOf} from './dsp/fft.js';
-import {hpssMask,applyMask} from './dsp/hpss.js';
-import {NB,NN_COUNT,logSpec,whiten,buildDict,nnls} from './dsp/nnls.js';
+import {stft,magOf} from './dsp/fft.js';
+import {analyzeSegment} from './analyzeSegment.js';
 import {renderResult} from './ui/panels.js';
 
 /* ---------------- selection slice ---------------- */
@@ -54,81 +53,20 @@ async function analyze(){
     const sig=Float32Array.from(slice(6));
     if(sig.length<2048){ setStatus('Selection too short — fence at least ~0.2 s.',false,true); return; }
 
-    // --- stage 1: fine STFT + HPSS ---
-    const fn=4096, fh=2048;
-    let Sf=null, mask=null, harm=sig, perc=null;
-    if(S.hpss && sig.length>fn*2){
-      setStatus('Separating pitched from percussive …',true); await yield_();
-      Sf=stft(sig,fn,fh);
-      mask=hpssMask(magOf(Sf),Sf.frames,Sf.K,17,17);
-      await yield_();
-      harm=istft(applyMask(Sf,mask,false),sig.length);
-      perc=istft(applyMask(Sf,mask,true),sig.length);
-    }
-    S._fine={Sf,mask,sigLen:sig.length,sig};
+    // the whole pipeline lives in analyzeSegment(); onStage keeps the status
+    // line and the event-loop yields exactly where they used to be
+    const R=await analyzeSegment(sig,S.sr,{
+      a4:S.a4, fftN:S.fftN, decay:S.decay, hpss:S.hpss,
+      thr:S.thr, gate:S.GATE, nms:S.NMS, maxNotes:12,
+      onStage: async m=>{ if(m) setStatus(m,true); await yield_(); }
+    });
 
-    // --- stage 2: long STFT -> averaged magnitude ---
-    setStatus('Transforming …',true); await yield_();
-    let n=S.fftN;
-    while(n>harm.length && n>4096) n>>=1;
-    const hop=Math.max(1024,n>>2);
-    const SL=stft(harm,n,hop), ML=magOf(SL), K=SL.K;
-    const avg=new Float32Array(K);
-    for(let t=0;t<SL.frames;t++) for(let k=0;k<K;k++) avg[k]+=ML[t*K+k];
-    for(let k=0;k<K;k++) avg[k]/=SL.frames;
-
-    // --- stage 3: log-frequency + whitening ---
-    setStatus('Mapping to semitone bins …',true); await yield_();
-    const yraw=logSpec(avg,S.sr,n,S.a4);
-    const yw=whiten(yraw);
-
-    // --- stage 4: NNLS approximate transcription ---
-    setStatus('Fitting 88 harmonic templates (NNLS) …',true); await yield_();
-    const {D,fundBin}=buildDict(S.a4,S.decay);
-    const allCols=[...Array(NN_COUNT).keys()];
-    const xdet=nnls(D,allCols,yw,320,0.004);
-    await yield_();
-
-    let xm=0; for(let i=0;i<NN_COUNT;i++) if(xdet[i]>xm) xm=xdet[i];
-    const detN=new Float64Array(NN_COUNT);
-    for(let i=0;i<NN_COUNT;i++) detN[i]=xm>0?xdet[i]/xm:0;
-
-    // fundamental evidence: is there real energy at the note's own f0?
-    // without this the fit happily invents a note an octave below the true one,
-    // because that phantom note's 2nd partial can explain everything above it.
-    let ym=0; for(let k=0;k<NB;k++) if(yw[k]>ym) ym=yw[k];
-    const evid=new Float64Array(NN_COUNT);
-    for(let i=0;i<NN_COUNT;i++){
-      const p=fundBin[i], b0=Math.floor(p), fr=p-b0;
-      const o=((b0>=0&&b0<NB?yw[b0]:0)*(1-fr))+((b0+1>=0&&b0+1<NB?yw[b0+1]:0)*fr);
-      evid[i]= ym>0 ? o/ym : 0;
-    }
-
-    // --- stage 5: amplitudes on the un-whitened spectrum ---
-    const cand=[]; for(let i=0;i<NN_COUNT;i++) if(detN[i]>0.03) cand.push(i);
-    const xampS = cand.length? nnls(D,cand,yraw,260,0) : [];
-    const xamp=new Float64Array(NN_COUNT);
-    cand.forEach((c,i)=>xamp[c]=xampS[i]);
-
-    // --- stage 6: reconstruction + per-note overtone accounting ---
-    const recon=new Float32Array(NB);
-    for(let i=0;i<NN_COUNT;i++){ if(xdet[i]<=0) continue; const col=D[i];
-      for(let k=0;k<NB;k++) recon[k]+=xdet[i]*col[k]; }
-    const pfund=new Float64Array(NN_COUNT);
-    for(let i=0;i<NN_COUNT;i++){
-      const p=fundBin[i], b0=Math.floor(p), fr=p-b0;
-      const at=(col,b)=> (b>=0&&b<NB)?col[b]:0;
-      const own=xdet[i]*(at(D[i],b0)*(1-fr)+at(D[i],b0+1)*fr);
-      let oth=0;
-      for(let j=0;j<NN_COUNT;j++){
-        if(j===i||xdet[j]<=0) continue;
-        oth+=xdet[j]*(at(D[j],b0)*(1-fr)+at(D[j],b0+1)*fr);
-      }
-      pfund[i]= (own+oth)>1e-12 ? own/(own+oth) : 0;
-    }
-
-    S.ana={detN,xamp,pfund,evid,yraw,yw,recon,fundBin,ms:(performance.now()-t0)|0,
-           hpss:S.hpss,harm,perc,n};
+    S._fine={Sf:R.Sf,mask:R.mask,sigLen:sig.length,sig};
+    const n=R.windowSize;
+    S.ana={detN:R.detN,xamp:R.xamp,pfund:R.pfund,evid:R.evid,
+           yraw:R.yraw,yw:R.yw,recon:R.recon,fundBin:R.fundBin,
+           ms:(performance.now()-t0)|0,
+           hpss:S.hpss,harm:R.harm,perc:R.perc,n};
     renderResult();
     setStatus('Done in '+S.ana.ms+' ms · window '+n+' · A₄ '+S.a4.toFixed(1)+' Hz'+(S.hpss?' · percussion stripped':''));
   }catch(err){

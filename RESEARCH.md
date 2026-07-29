@@ -1,6 +1,8 @@
 # Browser-based chord, voicing and dynamics analyzer — research & architecture
 
-Findings behind the `harmonograph.html` prototype, plus the upgrade path if you take it further.
+Findings behind the Harmonograph prototype, plus the upgrade path if you take it further.
+
+> **Status note.** Written when the app was a single `harmonograph.html` file. It is now ES modules under `js/` (see the README for the layout), and several findings below have been superseded by measurement — `handoff.md` carries a harder 132-chord benchmark that supersedes §4's headline accuracy figures, and §10 records the open problem. Where the two disagree, the later measurement wins.
 
 ---
 
@@ -24,14 +26,17 @@ FFmpeg is the right tool for a *server*. For this app it is close to pure cost.
 
 **Files** — `<input type="file">` + drag-drop → `arrayBuffer()` → `decodeAudioData`. Done.
 
-**Recording** — `getUserMedia` + `MediaRecorder`. Three traps, all of which the prototype handles:
+**Recording** — `getUserMedia`, then raw PCM capture straight into an `AudioBuffer`. Four traps, all of which the prototype handles:
 
 1. **Kill the voice processing.** Browsers default to echo cancellation, noise suppression and auto gain control. All three destroy musical recordings — AGC pumps your dynamics, NS eats sustained tones. Request:
    ```js
    getUserMedia({audio:{echoCancellation:false, noiseSuppression:false, autoGainControl:false}})
    ```
-2. **Codecs are not interoperable.** Chrome/Firefox write `audio/webm;codecs=opus`; Safari writes `audio/mp4` (AAC). Feature-detect with `MediaRecorder.isTypeSupported()` rather than hardcoding. Since you decode locally with `decodeAudioData`, either is fine.
-3. **iOS requires a user gesture** to create or resume an `AudioContext`, and requires **https**. Create the context inside the button handler, never at page load.
+2. **Don't go through `MediaRecorder`.** The obvious path — `MediaRecorder` → `Blob` → `decodeAudioData` — was the original implementation and it was wrong for an analysis tool. It forces a lossy Opus or AAC round-trip, and the codec preference order decides which: any browser advertising `audio/mp4` support encoded to AAC. Compression artefacts land in exactly the high partials the NNLS fit reads to tell a note from an overtone. It also adds a decode step that can fail *after* the take is gone. Instead run the `MediaStream` through a `ScriptProcessor` and write `Float32Array` chunks straight into an `AudioBuffer`: no codec, no decode, nothing between the mic and the analysis. 30 s of mono at 48 kHz is 5.7 MB, which is nothing.
+3. **A mic needs a served origin.** `getUserMedia` is refused on `file://`. Since ES modules are also CORS-blocked there, the app must be served either way — `python -m http.server`, or the GitHub Pages deploy.
+4. **iOS requires a user gesture** to create or resume an `AudioContext`, and requires **https**. Create the context inside the button handler, never at page load.
+
+A related trap worth stating separately: **report the actual failure**. The first implementation caught every error — insecure origin, denied permission, no device, device busy, absent `MediaRecorder` — and printed one string, "Microphone blocked". That makes the single most common first-run failure indistinguishable from four others. Map `err.name` to its cause.
 
 Known iOS annoyance with no clean fix: granting mic access can force output from headphones to the built-in speaker. Worth a UI warning if people will monitor while recording.
 

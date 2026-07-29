@@ -15,13 +15,14 @@ import {detectA4,analyze} from './analysis.js';
 
 /* ---------------- pointer: select + pinch zoom ---------------- */
 const ptrs=new Map();
-let mode=null, dragEdge=null, pinch=null;
+let mode=null, dragEdge=null, pinch=null, selSave=null;
 wave.addEventListener('pointerdown',e=>{
   if(!S.mono) return;
   wave.setPointerCapture(e.pointerId);
   ptrs.set(e.pointerId,{x:e.offsetX,y:e.offsetY});
   if(ptrs.size===1){
     const x=e.offsetX;
+    selSave={a:S.selA,b:S.selB};          // a second finger may yet turn this into a pinch
     if(S.selA!=null){
       const xa=t2x(S.selA), xb=t2x(S.selB);
       if(Math.abs(x-xa)<18){ mode='edge'; dragEdge='a'; return; }
@@ -30,6 +31,9 @@ wave.addEventListener('pointerdown',e=>{
     mode='new'; S.selA=S.selB=clamp(x2t(x),0,S.dur); drawWave();
   }else if(ptrs.size===2){
     mode='pinch';
+    // the first finger already collapsed the fence to a point; that was a
+    // pinch starting, not a new selection, so put it back
+    if(selSave){ S.selA=selSave.a; S.selB=selSave.b; drawWave(); }
     const p=[...ptrs.values()];
     pinch={d:Math.abs(p[0].x-p[1].x)||1, c:(p[0].x+p[1].x)/2, a:S.viewA, b:S.viewB};
   }

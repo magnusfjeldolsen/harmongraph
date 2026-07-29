@@ -204,7 +204,9 @@ async function buildIso(kind){
     const Sn=F.Sf||stft(sig,n,hop);
     const K=Sn.K, df=S.sr/Sn.n;
     const keep=new Float32Array(K);
-    const list=[...noteOn];
+    // only notes in the current analysis — noteOn is keyed by pitch and can
+    // still hold picks from an earlier chord
+    const list=(S.rows||[]).filter(r=>noteOn.has(r.i)).map(r=>r.i);
     if(!list.length){ setStatus('Tick at least one note to solo it.',false,true); return; }
     list.forEach(i=>{
       const f0=midiFreq(NOTE_LO+i,S.a4);

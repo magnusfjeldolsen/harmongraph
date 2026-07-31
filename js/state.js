@@ -53,6 +53,10 @@ function ac(){
 function audioSession(type){
   try{ if(navigator.audioSession) navigator.audioSession.type=type; }catch(e){}
 }
+/* Only iOS has the routing problem, so only iOS pays for the workaround.
+   iPadOS reports itself as a Mac, hence the touch-point check. */
+const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent||'') ||
+              (/Mac/.test(navigator.userAgent||'') && (navigator.maxTouchPoints||0) > 1);
 
 /* resume() is a promise, and a suspended context's currentTime does not
    advance. Scheduling against that clock silently drops everything, which
@@ -71,4 +75,4 @@ function setStatus(t,busy,err){
   el.innerHTML=(busy?'<span class="spin"></span>':'')+t;
 }
 
-export {$,clamp,fmtT,yield_,S,noteOn,noteVote,ac,acReady,audioSession,setStatus};
+export {$,clamp,fmtT,yield_,S,noteOn,noteVote,ac,acReady,audioSession,isIOS,setStatus};

@@ -5,7 +5,7 @@
    Owns the controls of the Source, Waveform-transport, Listen and
    Hear-the-chord-back panels.
    ============================================================ */
-import {$,S,clamp,ac,acReady,audioSession,setStatus,yield_,noteOn} from './state.js';
+import {$,S,clamp,ac,acReady,audioSession,isIOS,setStatus,yield_,noteOn} from './state.js';
 import {midiFreq} from './pitch.js';
 import {NOTE_LO} from './dsp/nnls.js';
 import {stft,istft} from './dsp/fft.js';
@@ -142,13 +142,14 @@ async function stopRec(){
   // left it in play-and-record, which routes output to the earpiece receiver
   // at low volume and stays that way after the tracks stop.
   audioSession('playback');
-  if(!navigator.audioSession && S.ac){
+  if(isIOS && !navigator.audioSession && S.ac){
     // Safari before 16.4 has no way to ask, and the routing survives the
     // stopped tracks — closing the context and building the take in a fresh
-    // one is the only lever left. AudioBuffers are context-bound, so the PCM
-    // has to be re-wrapped either way.
+    // one is the only lever left. Restricted to iOS because nothing else has
+    // the problem, and tearing the context down costs every cached note
+    // buffer, which belongs to the context that is going away.
     try{ await S.ac.close(); }catch(e){}
-    S.ac=null;
+    S.ac=null; noteCache.clear();
   }
   const c=ac();
   const b=c.createBuffer(1,R.n,rate);
@@ -170,10 +171,16 @@ $('#recBtn').onclick=async()=>{
   try{
     stopPlay(); stopSynth();                        // never capture our own output
     audioSession('play-and-record');
-    const c=await acReady();
+    // getUserMedia goes FIRST, before anything is awaited. Safari grants a
+    // transient user activation on the tap and awaiting spends it, after
+    // which the mic request is no longer gesture-initiated and never
+    // prompts. Note also that acReady() must not be used here: it asks for
+    // the playback session, which would undo the line above.
     stream=await navigator.mediaDevices.getUserMedia({audio:{
       echoCancellation:false, noiseSuppression:false, autoGainControl:false, channelCount:1
     }});
+    const c=ac();
+    if(c.state!=='running'){ try{ await c.resume(); }catch(e){} }
     const src=c.createMediaStreamSource(stream);
     const node=c.createScriptProcessor(4096,1,1);
     const mute=c.createGain(); mute.gain.value=0;   // a ScriptProcessor only pulls once routed to the destination

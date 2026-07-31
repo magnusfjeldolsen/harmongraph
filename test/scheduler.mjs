@@ -35,7 +35,8 @@ class Param{ constructor(v){this.value=v}
   setValueAtTime(v){this.value=v; return this}
   linearRampToValueAtTime(v){this.value=v; return this} }
 class Node{
-  constructor(t){ this.type=t; this.gain=new Param(1); this.frequency=new Param(0); }
+  constructor(t){ this.type=t; this.gain=new Param(1); this.frequency=new Param(0);
+                  this.playbackRate=new Param(1); }
   connect(d){ return d } disconnect(){}
   start(t,off,len){ this._start=t??NOW; this._off=off; this._len=len; started.push(this) }
   stop(){ if(!this._stopped){ this._stopped=true; stopped.push(this); } }
@@ -54,12 +55,19 @@ globalThis.window={AudioContext:Ctx,devicePixelRatio:1,addEventListener(){}};
 globalThis.setInterval=fn=>{ intervals.push(fn); return intervals.length-1 };
 globalThis.clearInterval=id=>{ if(intervals[id]) intervals[id]=()=>{}; };
 globalThis.performance={now:()=>0};
+globalThis.requestAnimationFrame=()=>0;
+/* Click handlers do not return their promise, so awaiting the handler does
+   not await the work. Drain the microtask queue instead. */
+const flush=async()=>{ for(let i=0;i<8;i++) await Promise.resolve(); await new Promise(r=>setTimeout(r,0)); };
 
 const {S,noteOn}=await import('../js/state.js');
 await import('../js/audio.js');
 
 S.sr=44100; S.a4=440; S.voice='piano'; S.useDyn=true;
 S.dur=3; S.selA=0; S.selB=2; S.mono=new Float32Array(44100*3); S.buf={};
+S.pkSize=256;                                  // drawWave() reads the peak pyramid
+{ const cnt=Math.ceil(S.mono.length/S.pkSize);
+  S.peaks={mn:new Float32Array(cnt), mx:new Float32Array(cnt), cnt}; }
 S.rows=[{i:39,midi:60,name:'C4',db:0},  {i:43,midi:64,name:'E4',db:-4},
         {i:46,midi:67,name:'G4',db:-6}, {i:50,midi:71,name:'B4',db:-9},
         {i:53,midi:74,name:'D5',db:-12}];
@@ -127,6 +135,25 @@ await p1; await p2;
 NOW=31; pump();
 check('second press stops rather than racing',el('#synthPlay').textContent,'▶ Play chord');
 check('no scheduler left running',srcs().length,0);
+
+/* The workflow is record -> analyse -> play the chord. Those two transports
+   must never sound at once: starting the chord has to abort the recording
+   loop, and starting the recording has to abort the chord. */
+console.log('\none transport at a time');
+S.voice='piano';
+await el('#synthPlay').onclick();               // stop whatever is running
+started.length=0; NOW=50;
+S.playing=false;
+el('#playBtn').onclick(); await flush();        // recording loop
+check('recording loop is playing',S.playing,true);
+await el('#synthPlay').onclick(); await flush();// now play the chord
+check('starting the chord stops the recording',S.playing,false);
+check('and the chord is running',el('#synthPlay').textContent,'■ Stop');
+el('#playBtn').onclick(); await flush();        // back to the recording
+check('starting the recording stops the chord',el('#synthPlay').textContent,'▶ Play chord');
+check('recording is playing again',S.playing,true);
+el('#playBtn').onclick(); await flush();
+check('and stops',S.playing,false);
 
 console.log('\nand the button still works afterwards');
 started.length=0; NOW=40;

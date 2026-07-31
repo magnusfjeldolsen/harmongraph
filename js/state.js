@@ -37,10 +37,20 @@ function ac(){
   if(S.ac.state==='suspended') S.ac.resume();
   return S.ac;
 }
+/* resume() is a promise, and a suspended context's currentTime does not
+   advance. Scheduling against that clock silently drops everything, which
+   is the usual reason playback "sometimes does nothing" on a phone — iOS
+   suspends the context on interruptions and after backgrounding, not only
+   before the first gesture. Await this anywhere playback is about to start. */
+async function acReady(){
+  const c=ac();
+  if(c.state!=='running'){ try{ await c.resume(); }catch(e){} }
+  return c;
+}
 function setStatus(t,busy,err){
   const el=$('#status');
   el.className=err?'err':'';
   el.innerHTML=(busy?'<span class="spin"></span>':'')+t;
 }
 
-export {$,clamp,fmtT,yield_,S,noteOn,noteVote,ac,setStatus};
+export {$,clamp,fmtT,yield_,S,noteOn,noteVote,ac,acReady,setStatus};

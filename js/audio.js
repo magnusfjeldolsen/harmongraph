@@ -5,7 +5,7 @@
    Owns the controls of the Source, Waveform-transport, Listen and
    Hear-the-chord-back panels.
    ============================================================ */
-import {$,S,clamp,ac,setStatus,yield_,noteOn} from './state.js';
+import {$,S,clamp,ac,acReady,setStatus,yield_,noteOn} from './state.js';
 import {midiFreq} from './pitch.js';
 import {NOTE_LO} from './dsp/nnls.js';
 import {stft,istft} from './dsp/fft.js';
@@ -63,10 +63,11 @@ function playBuffer(){
   if(!b) return {buf:S.buf,off:S.selA,len:S.selB-S.selA,full:true};
   return {buf:b,off:0,len:b.duration,full:false};
 }
-function startPlay(){
+async function startPlay(){
   if(!S.buf) return;
-  stopPlay(); stopSynth();
-  const c=ac();
+  stopPlay(); stopSynth();          // one transport at a time: the synth loop yields to the recording
+  const c=await acReady();
+  if(S.playing) return;             // superseded while the context was resuming
   const P=playBuffer();
   const s=c.createBufferSource();
   s.buffer=P.buf;
@@ -122,6 +123,25 @@ function stopRec(){
   if(!R.n){ setStatus('Nothing was captured — the mic delivered no audio.',false,true); return; }
   const b=R.ctx.createBuffer(1,R.n,R.ctx.sampleRate), d=b.getChannelData(0);
   let o=0; for(const ch of R.chunks){ d.set(ch,o); o+=ch.length; }
+  // Bring the take up to a normal listening level. We ask for the mic with
+  // autoGainControl off, because AGC pumps dynamics and the whole point of
+  // this tool is measuring them — but that leaves the raw stream very quiet
+  // on phones, and playing it back at unity made a loud performance sound
+  // almost silent. Peak normalisation is safe here: the analysis is scale
+  // invariant (whitening standardises, and the note levels it reports are
+  // relative to the loudest note), so this changes what you hear and not
+  // what is measured.
+  let pk=0; for(let i=0;i<R.n;i++){ const a=Math.abs(d[i]); if(a>pk) pk=a; }
+  if(pk>0&&pk<0.89){
+    const g=0.89/pk;
+    for(let i=0;i<R.n;i++) d[i]*=g;
+    setBuffer(b,'mic recording');
+    const dbfs=20*Math.log10(pk);
+    setStatus('Recorded '+(R.n/R.ctx.sampleRate).toFixed(1)+'s · input peaked at '
+      +dbfs.toFixed(0)+' dBFS, raised by '+(20*Math.log10(g)).toFixed(0)+' dB for playback.'
+      +(dbfs<-40?' That is very quiet — check the mic input level.':''));
+    return;
+  }
   setBuffer(b,'mic recording');
 }
 $('#recBtn').onclick=async()=>{
@@ -446,14 +466,17 @@ async function playSynth(kind){
   if(was===kind) return;
   const rows=activeRows();
   if(!rows.length){ setStatus('Tick at least one note to play it back.',false,true); return; }
-  const c=ac();
-  // Claim the transport before the first await. Rendering up to 12 notes takes
-  // hundreds of ms, and if synthKind stayed null across it the UI would read
-  // "not playing" while a start was in flight — press again and the toggle
-  // logic would mistake the in-flight start for a stop, leaving synthKind set
-  // and the button dead. seq lets a later press supersede this one instead.
+  // Claim the transport before the FIRST await — resuming the context and
+  // rendering up to 12 notes both take real time, and if synthKind stayed
+  // null across that the UI would read "not playing" while a start was in
+  // flight: press again and the toggle logic mistakes the in-flight start
+  // for a stop, leaving synthKind set and the button dead. seq lets a later
+  // press supersede this one instead. Every await below this line needs its
+  // seq guard, which is why the guard sits immediately after each one.
   const seq=++synthSeq;
   synthKind=kind; updSynthUI();
+  const c=await acReady();
+  if(seq!==synthSeq) return;
   const cold=rows.filter(r=>!noteCache.has(S.voice+'|'+r.midi+'|'+velBucket(noteVel(r))+'|'+S.sr+'|'+S.a4.toFixed(2)));
   if(cold.length){
     setStatus('Rendering '+(S.voice==='rhodes'?'Rhodes':'piano')+' …',true);

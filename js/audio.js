@@ -354,7 +354,7 @@ const noteVel=r=>S.useDyn?clamp((r.db+42)/42,0.12,1):0.7;
    and buys live editing: the set is re-read at the top of every cycle, so
    an edit lands on the next pass instead of restarting playback. */
 const LOOKAHEAD=0.25, TICK_MS=100, GAP=0.3, NOTE_LEN=3.0, ARP=0.110;
-let sched=null, synthKind=null;
+let sched=null, synthKind=null, synthSeq=0;
 
 function buildChain(){
   const c=ac();
@@ -423,6 +423,7 @@ function track(s){
   s.onended=()=>{ if(!sched) return; const i=sched.nodes.indexOf(s); if(i>=0) sched.nodes.splice(i,1); };
 }
 function stopSynth(){
+  synthSeq++;                    // supersede any start still rendering
   if(sched){
     clearInterval(sched.timer);
     sched.nodes.forEach(n=>{ try{n.stop();}catch(e){} try{n.disconnect();}catch(e){} });
@@ -446,13 +447,24 @@ async function playSynth(kind){
   const rows=activeRows();
   if(!rows.length){ setStatus('Tick at least one note to play it back.',false,true); return; }
   const c=ac();
+  // Claim the transport before the first await. Rendering up to 12 notes takes
+  // hundreds of ms, and if synthKind stayed null across it the UI would read
+  // "not playing" while a start was in flight — press again and the toggle
+  // logic would mistake the in-flight start for a stop, leaving synthKind set
+  // and the button dead. seq lets a later press supersede this one instead.
+  const seq=++synthSeq;
+  synthKind=kind; updSynthUI();
   const cold=rows.filter(r=>!noteCache.has(S.voice+'|'+r.midi+'|'+velBucket(noteVel(r))+'|'+S.sr+'|'+S.a4.toFixed(2)));
   if(cold.length){
     setStatus('Rendering '+(S.voice==='rhodes'?'Rhodes':'piano')+' …',true);
     await yield_();
-    for(const r of cold){ renderNote(r.midi,noteVel(r),S.voice); await yield_(); }
+    for(const r of cold){
+      if(seq!==synthSeq) return;                 // superseded mid-render
+      renderNote(r.midi,noteVel(r),S.voice);
+      await yield_();
+    }
   }
-  synthKind=kind;
+  if(seq!==synthSeq) return;
   sched={...buildChain(), nodes:[], nextAt:c.currentTime+0.06, timer:null};
   pump();
   sched.timer=setInterval(pump,TICK_MS);

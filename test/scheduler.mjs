@@ -52,7 +52,7 @@ class Ctx{
 }
 globalThis.window={AudioContext:Ctx,devicePixelRatio:1,addEventListener(){}};
 globalThis.setInterval=fn=>{ intervals.push(fn); return intervals.length-1 };
-globalThis.clearInterval=()=>{};
+globalThis.clearInterval=id=>{ if(intervals[id]) intervals[id]=()=>{}; };
 globalThis.performance={now:()=>0};
 
 const {S,noteOn}=await import('../js/state.js');
@@ -113,6 +113,28 @@ console.log('\nteardown');
 const live=srcs().filter(n=>!n._stopped).length;
 await el('#abBtn').onclick();
 check('every live source stopped',stopped.length,live);
+
+/* Rendering cold notes spans hundreds of ms of awaits. A press landing in
+   that window must supersede the in-flight start, not race it — otherwise
+   two schedulers exist, only one is reachable by stop, and synthKind can end
+   up set while the button reads "Play", which makes the button dead. */
+console.log('\npressing play twice while notes are still rendering');
+S.voice='rhodes';                          // cold cache, so the render awaits
+started.length=0; stopped.length=0; NOW=30;
+const p1=el('#synthPlay').onclick();
+const p2=el('#synthPlay').onclick();
+await p1; await p2;
+NOW=31; pump();
+check('second press stops rather than racing',el('#synthPlay').textContent,'▶ Play chord');
+check('no scheduler left running',srcs().length,0);
+
+console.log('\nand the button still works afterwards');
+started.length=0; NOW=40;
+await el('#synthPlay').onclick();
+check('a later press starts cleanly',srcs().length,5);
+check('button reflects it',el('#synthPlay').textContent,'■ Stop');
+await el('#synthPlay').onclick();
+check('and stops again',el('#synthPlay').textContent,'▶ Play chord');
 
 console.log('\n'+(fails?fails+' FAILED':'all passed'));
 process.exit(fails?1:0);

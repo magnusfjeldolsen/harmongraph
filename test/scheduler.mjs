@@ -47,8 +47,9 @@ class Ctx{
   createGain(){ return new Node('gain') }
   createBufferSource(){ return new Node('src') }
   createOscillator(){ return new Node('osc') }
-  createBuffer(ch,len,sr){ return {length:len,sampleRate:sr,numberOfChannels:ch,
-    copyToChannel(){}, getChannelData:()=>new Float32Array(len)} }
+  createBuffer(ch,len,sr){ const d=new Float32Array(len);
+    return {length:len,sampleRate:sr,numberOfChannels:ch,duration:len/sr,
+            copyToChannel(){}, getChannelData:()=>d} }
   resume(){}
 }
 globalThis.window={AudioContext:Ctx,devicePixelRatio:1,addEventListener(){}};
@@ -60,7 +61,7 @@ globalThis.requestAnimationFrame=()=>0;
    not await the work. Drain the microtask queue instead. */
 const flush=async()=>{ for(let i=0;i<8;i++) await Promise.resolve(); await new Promise(r=>setTimeout(r,0)); };
 
-const {S,noteOn}=await import('../js/state.js');
+const {S,noteOn,noteVote}=await import('../js/state.js');
 await import('../js/audio.js');
 
 S.sr=44100; S.a4=440; S.voice='piano'; S.useDyn=true;
@@ -155,7 +156,30 @@ check('recording is playing again',S.playing,true);
 el('#playBtn').onclick(); await flush();
 check('and stops',S.playing,false);
 
+/* Loading new audio has to be a clean slate. Anything derived from the old
+   take that survives shows up as a bug that looks unrelated to loading:
+   the previous recording keeps sounding, "Play chord" plays the previous
+   analysis, an isolation button stays lit over a full-mix playback. */
+console.log('\nnew audio resets everything derived from the old take');
+started.length=0; NOW=60;
+S.playing=false; S.iso='notes'; S.isoBufs={notes:{}}; S._fine={x:1};
+noteOn.add(39); noteVote.set(39,false);
+el('#playBtn').onclick(); await flush();
+check('recording is playing before the load',S.playing,true);
+el('#demoBtn').onclick(); await flush();        // demo chord goes through setBuffer()
+check('loading new audio stops the transport',S.playing,false);
+check('isolation resets to the full mix',S.iso,'full');
+check('stale analysis rows cleared',S.rows,null);
+check('stale note picks cleared',noteOn.size,0);
+check('stale user votes cleared',noteVote.size,0);
+check('stale analysis frames cleared',S._fine,null);
+check('view resets to the whole file',S.viewA,0);
+
 console.log('\nand the button still works afterwards');
+S.rows=[{i:39,midi:60,name:'C4',db:0},  {i:43,midi:64,name:'E4',db:-4},
+        {i:46,midi:67,name:'G4',db:-6}, {i:50,midi:71,name:'B4',db:-9},
+        {i:53,midi:74,name:'D5',db:-12}];
+noteOn.clear(); S.rows.forEach(r=>noteOn.add(r.i));
 started.length=0; NOW=40;
 await el('#synthPlay').onclick();
 check('a later press starts cleanly',srcs().length,5);

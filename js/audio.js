@@ -5,7 +5,7 @@
    Owns the controls of the Source, Waveform-transport, Listen and
    Hear-the-chord-back panels.
    ============================================================ */
-import {$,S,clamp,ac,acReady,audioSession,isIOS,setStatus,yield_,noteOn} from './state.js';
+import {$,S,clamp,ac,acReady,audioSession,isIOS,setStatus,yield_,noteOn,noteVote} from './state.js';
 import {midiFreq} from './pitch.js';
 import {NOTE_LO} from './dsp/nnls.js';
 import {stft,istft} from './dsp/fft.js';
@@ -23,21 +23,40 @@ async function loadArrayBuffer(ab,label){
     setStatus('Could not decode that file. Try WAV, MP3 or M4A.',false,true);
   }
 }
+/* New audio means a clean slate. Everything derived from the previous take
+   has to go, not just the waveform — leaving any of it behind produces
+   symptoms that look unrelated to loading a file:
+     - a still-running transport keeps sounding the OLD recording, and its
+       rAF loop keeps drawing a stale playhead over the new waveform, which
+       is why the display appeared to take a moment to settle
+     - S.rows survives, so "Play chord" would play the previous analysis
+       even though the result panel is hidden
+     - S.iso survives, so an isolation button stays lit while playback has
+       silently fallen back to the full mix, because isoBufs was cleared */
 function setBuffer(b,label){
+  stopPlay(); stopSynth();
   S.buf=b; S.sr=b.sampleRate; S.dur=b.duration;
   const n=b.length, m=new Float32Array(n);
   for(let c=0;c<b.numberOfChannels;c++){ const d=b.getChannelData(c); for(let i=0;i<n;i++) m[i]+=d[i]; }
   const g=1/b.numberOfChannels; for(let i=0;i<n;i++) m[i]*=g;
   S.mono=m;
   buildPeaks();
-  S.viewA=0; S.viewB=S.dur;
-  S.selA=0; S.selB=Math.min(S.dur,2.5);
-  S.isoBufs={}; S.ana=null;
+  S.viewA=0; S.viewB=S.dur;                       // full view
+  S.selA=0; S.selB=Math.min(S.dur,2.5);           // default fence
+  S.isoBufs={}; S.ana=null; S._fine=null; S.rows=null;
+  noteOn.clear(); noteVote.clear();
+  S.iso='full';
+  document.querySelectorAll('.iso').forEach(x=>x.classList.toggle('on',x.dataset.iso==='full'));
   $('#srcInfo').textContent=label+' · '+S.dur.toFixed(1)+'s · '+S.sr+' Hz';
   $('#wavePanel').style.display='';
   $('#setPanel').style.display='';
   $('#resPanel').style.display='none';
   fitCanvas(); drawWave();
+  // The waveform panel may have gone from display:none to visible on this
+  // very call. fitCanvas() forces layout so the first draw is usually right,
+  // but a second pass on the next frame costs nothing and covers the case
+  // where the panel's box is still settling.
+  requestAnimationFrame(()=>{ fitCanvas(); drawWave(); });
   setStatus('Drag on the waveform to fence a chord, then press Analyze.');
 }
 function buildPeaks(){

@@ -45,10 +45,13 @@ const RUNTIME_BUDGET_MS=900;
 
 /* ---------------- args ---------------- */
 function parseArgs(argv){
-  const a={save:false,compare:null,timbre:null,voicing:null,json:false,quiet:false};
+  const a={save:false,compare:null,timbre:null,voicing:null,json:false,quiet:false,opt:{}};
   for(let i=0;i<argv.length;i++){
     const t=argv[i];
-    if(t==='--save') a.save=true;
+    // --opt decay=0.8 : override one pipeline setting for this run only, so a
+    // hypothesis can be swept without editing the shipped defaults
+    if(t==='--opt'){ const [k,v]=String(argv[++i]||'').split('='); a.opt[k]=(v==='true'||v==='false')?v==='true':+v; }
+    else if(t==='--save') a.save=true;
     else if(t==='--compare') a.compare=argv[++i]||'baseline.json';
     else if(t==='--timbre') a.timbre=argv[++i];
     else if(t==='--voicing') a.voicing=argv[++i];
@@ -220,6 +223,10 @@ function printCompare(base,now){
 
 /* ---------------- main ---------------- */
 const args=parseArgs(process.argv.slice(2));
+if(Object.keys(args.opt).length){
+  Object.assign(OPTS,args.opt);
+  console.log('overrides: '+JSON.stringify(args.opt));
+}
 const res=await run(args);
 
 if(args.json){

@@ -17,7 +17,7 @@ const S={
   peaks:null, pkSize:256,
   src:null, playT0:0, playOff:0, playing:false, loop:true, rate:1,
   iso:'full', isoBufs:{},
-  ana:null, hpss:true, thr:0.12, a4:440, fftN:16384, decay:0.72,
+  ana:null, hpss:true, thr:0.12, a4:440, fftN:16384, decay:0.72, fund:1,
   GATE:0.08, NMS:1.5, voice:'piano', useDyn:true, rows:null,
   // playAll: play everything the detector found, ignoring the ticks without
   // clearing them, so you can flip between the algorithm's answer and your

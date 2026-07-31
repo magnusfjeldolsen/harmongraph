@@ -46,7 +46,7 @@ function selectNotes(detN,evid,thr,gate,nms,maxNotes){
    old analyze() did. Omit it and the function is straight-line. */
 async function analyzeSegment(sig,sr,opts={}){
   const {a4=440, fftN=16384, decay=0.72, hpss=true,
-         thr=0.12, gate=0.08, nms=1.5, maxNotes=12, wfloor=0.3,
+         thr=0.12, gate=0.08, nms=1.5, maxNotes=12, wfloor=0.3, fund=1,
          onStage=null} = opts;
   const stage = onStage ? (m=>onStage(m)) : null;
   const t0=now();
@@ -80,7 +80,7 @@ async function analyzeSegment(sig,sr,opts={}){
 
   // --- stage 4: NNLS approximate transcription ---
   if(stage) await stage('Fitting 88 harmonic templates (NNLS) …');
-  const {D,fundBin}=buildDict(a4,decay);
+  const {D,fundBin}=buildDict(a4,decay,fund);
   const allCols=[...Array(NN_COUNT).keys()];
   const xdet=nnls(D,allCols,yw,320,0.004);
   if(stage) await stage(null);

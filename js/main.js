@@ -104,6 +104,7 @@ $('#a4').oninput=e=>{ S.a4=clamp(+e.target.value||440,380,500); S.ana=null; };
 $('#thr').oninput=e=>{ S.thr=+e.target.value; $('#thrTxt').textContent=S.thr.toFixed(2); if(S.ana) renderResult(); };
 $('#fftSize').onchange=e=>{ S.fftN=+e.target.value; };
 $('#decay').oninput=e=>{ S.decay=+e.target.value; $('#decTxt').textContent=S.decay.toFixed(2); };
+$('#fund').oninput=e=>{ S.fund=+e.target.value; $('#fundTxt').textContent=S.fund.toFixed(2); };
 $('#hpssBtn').onclick=e=>{ S.hpss=!S.hpss; e.target.classList.toggle('on',S.hpss); };
 $('#analyzeBtn').onclick=()=>analyze();
 $('#detectA4').onclick=()=>detectA4();

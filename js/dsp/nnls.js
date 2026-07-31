@@ -73,9 +73,18 @@ function whiten(y,wfloor=0.3){
 }
 
 /* ---------------- note dictionary ---------------- */
+/* `fund` scales the first partial only. With the plain s^(h-1) profile the
+   fundamental is always the strongest component of a template, so a note
+   whose fundamental is genuinely weaker than its second partial cannot be
+   represented at all — and the cheapest way for the fit to explain such a
+   spectrum is to put the note an octave up, where the strong 2f0 becomes a
+   fundamental it can model. That is the octave-up error, and it is why the
+   `formant` timbre (fundamental deliberately not the loudest partial) is the
+   worst case in the corpus. fund<1 lets the dictionary say what real strings,
+   small speakers and most microphones do to a low fundamental. */
 let dict=null, dictKey='';
-function buildDict(a4,s){
-  const key=a4.toFixed(3)+'|'+s;
+function buildDict(a4,s,fund=1){
+  const key=a4.toFixed(3)+'|'+s+'|'+fund;
   if(dictKey===key) return dict;
   const D=[], fundBin=new Float32Array(NN_COUNT);
   for(let i=0;i<NN_COUNT;i++){
@@ -85,7 +94,7 @@ function buildDict(a4,s){
     for(let h=1;h<=20;h++){
       const p=freqBin(f0*h,a4);
       if(p>=NB-1) break;
-      const a=Math.pow(s,h-1);
+      const a=Math.pow(s,h-1)*(h===1?fund:1);
       const b0=Math.floor(p);
       let tot=0; const w=[];
       for(let d=-1;d<=2;d++){ const u=Math.abs(p-(b0+d)); const v=Math.max(0,1-u/1.5); w.push(v); tot+=v; }

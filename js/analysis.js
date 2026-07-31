@@ -56,7 +56,7 @@ async function analyze(){
     // the whole pipeline lives in analyzeSegment(); onStage keeps the status
     // line and the event-loop yields exactly where they used to be
     const R=await analyzeSegment(sig,S.sr,{
-      a4:S.a4, fftN:S.fftN, decay:S.decay, hpss:S.hpss,
+      a4:S.a4, fftN:S.fftN, decay:S.decay, fund:S.fund, hpss:S.hpss,
       thr:S.thr, gate:S.GATE, nms:S.NMS, maxNotes:12,
       onStage: async m=>{ if(m) setStatus(m,true); await yield_(); }
     });

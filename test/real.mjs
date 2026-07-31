@@ -20,6 +20,16 @@ import {analyzeSegment} from '../js/analyzeSegment.js';
 const DIR=process.argv[2];
 if(!DIR){ console.error('usage: node test/real.mjs <dataset-dir>'); process.exit(2); }
 const only=process.argv.includes('--comp')?'comp':process.argv.includes('--solo')?'solo':null;
+/* --opt key=value, same as the synthetic harness, so a setting can be swept
+   against real recordings and not only against the model's own assumptions */
+const OPTS={};
+for(let i=3;i<process.argv.length;i++){
+  if(process.argv[i]==='--opt'){
+    const [k,v]=String(process.argv[++i]||'').split('=');
+    OPTS[k]=(v==='true'||v==='false')?v==='true':+v;
+  }
+}
+if(Object.keys(OPTS).length) console.log('overrides: '+JSON.stringify(OPTS));
 
 /* ---- minimal 16-bit PCM WAV reader ---- */
 function readWav(path){
@@ -69,7 +79,7 @@ for(const w of wins){
   if(b-a<2048) continue;
 
   const t0=Date.now();
-  const R=await analyzeSegment(Float32Array.from(pcm.subarray(a,b)),sr,{});
+  const R=await analyzeSegment(Float32Array.from(pcm.subarray(a,b)),sr,OPTS);
   const ms=Date.now()-t0;
 
   const got=R.notes.map(n=>n.midi), truth=w.truth;

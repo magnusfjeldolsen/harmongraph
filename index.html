@@ -96,6 +96,10 @@
     <label class="field" style="margin-bottom:10px">Timbre — pure ↔ bright <span class="num" id="decTxt">0.72</span>
       <input type="range" id="decay" min="0.60" max="0.86" step="0.01" value="0.72">
     </label>
+    <label class="field" style="margin-bottom:6px">Fundamental — weak ↔ strong <span class="num" id="fundTxt">1.00</span>
+      <input type="range" id="fund" min="0.45" max="1.00" step="0.05" value="1.00">
+    </label>
+    <div class="hint" style="margin-bottom:10px">Move this <b>left</b> if a note is being reported an octave too high. It tells the fit your instrument's fundamental is quieter than its overtones, which is true of most guitars, small speakers and phone mics — and an octave-up reading is what happens when the fit does not believe that.</div>
     <div class="row" style="margin-bottom:10px">
       <button id="hpssBtn" class="on grow">Strip percussion (HPSS)</button>
       <button id="analyzeBtn" class="pri grow">Analyze selection</button>

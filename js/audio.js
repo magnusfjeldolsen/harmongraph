@@ -5,7 +5,7 @@
    Owns the controls of the Source, Waveform-transport, Listen and
    Hear-the-chord-back panels.
    ============================================================ */
-import {$,S,clamp,ac,acReady,setStatus,yield_,noteOn} from './state.js';
+import {$,S,clamp,ac,acReady,audioSession,setStatus,yield_,noteOn} from './state.js';
 import {midiFreq} from './pitch.js';
 import {NOTE_LO} from './dsp/nnls.js';
 import {stft,istft} from './dsp/fft.js';
@@ -114,15 +114,18 @@ function micError(err){
   if(n==='NotReadableError') return 'The microphone is busy — another app or tab is holding it.';
   return 'Microphone failed to start: '+n;
 }
-function stopRec(){
+async function stopRec(){
   const R=S.rec; if(!R) return; S.rec=null;
   clearInterval(R.timer); R.node.onaudioprocess=null;
   try{ R.src.disconnect(); R.node.disconnect(); R.mute.disconnect(); }catch(e){}
   R.stream.getTracks().forEach(t=>t.stop());
   $('#recBtn').classList.remove('armed'); $('#recBtn').textContent='● Record from mic';
   if(!R.n){ setStatus('Nothing was captured — the mic delivered no audio.',false,true); return; }
-  const b=R.ctx.createBuffer(1,R.n,R.ctx.sampleRate), d=b.getChannelData(0);
-  let o=0; for(const ch of R.chunks){ d.set(ch,o); o+=ch.length; }
+
+  const rate=R.ctx.sampleRate;
+  const pcm=new Float32Array(R.n);
+  let o=0; for(const ch of R.chunks){ pcm.set(ch,o); o+=ch.length; }
+
   // Bring the take up to a normal listening level. We ask for the mic with
   // autoGainControl off, because AGC pumps dynamics and the whole point of
   // this tool is measuring them — but that leaves the raw stream very quiet
@@ -131,27 +134,43 @@ function stopRec(){
   // invariant (whitening standardises, and the note levels it reports are
   // relative to the loudest note), so this changes what you hear and not
   // what is measured.
-  let pk=0; for(let i=0;i<R.n;i++){ const a=Math.abs(d[i]); if(a>pk) pk=a; }
-  if(pk>0&&pk<0.89){
-    const g=0.89/pk;
-    for(let i=0;i<R.n;i++) d[i]*=g;
-    setBuffer(b,'mic recording');
-    const dbfs=20*Math.log10(pk);
-    setStatus('Recorded '+(R.n/R.ctx.sampleRate).toFixed(1)+'s · input peaked at '
-      +dbfs.toFixed(0)+' dBFS, raised by '+(20*Math.log10(g)).toFixed(0)+' dB for playback.'
-      +(dbfs<-40?' That is very quiet — check the mic input level.':''));
-    return;
+  let pk=0; for(let i=0;i<R.n;i++){ const a=Math.abs(pcm[i]); if(a>pk) pk=a; }
+  let g=1;
+  if(pk>0&&pk<0.89){ g=0.89/pk; for(let i=0;i<R.n;i++) pcm[i]*=g; }
+
+  // Hand the audio session back before anything is played. On iOS the mic
+  // left it in play-and-record, which routes output to the earpiece receiver
+  // at low volume and stays that way after the tracks stop.
+  audioSession('playback');
+  if(!navigator.audioSession && S.ac){
+    // Safari before 16.4 has no way to ask, and the routing survives the
+    // stopped tracks — closing the context and building the take in a fresh
+    // one is the only lever left. AudioBuffers are context-bound, so the PCM
+    // has to be re-wrapped either way.
+    try{ await S.ac.close(); }catch(e){}
+    S.ac=null;
   }
+  const c=ac();
+  const b=c.createBuffer(1,R.n,rate);
+  b.copyToChannel(pcm,0);
   setBuffer(b,'mic recording');
+
+  const dbfs=pk>0?20*Math.log10(pk):-120;
+  setStatus('Recorded '+(R.n/rate).toFixed(1)+'s · input peaked at '+dbfs.toFixed(0)+' dBFS'
+    +(g>1.02?', raised '+(20*Math.log10(g)).toFixed(0)+' dB for playback':'')+'.'
+    +(dbfs<-40?' That is very quiet — check the mic input level.':'')
+    +' If you hear nothing on iPhone, check the ring/silent switch.');
 }
 $('#recBtn').onclick=async()=>{
-  if(S.rec){ stopRec(); return; }
+  if(S.rec){ await stopRec(); return; }
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
     setStatus(micError({name:'unsupported'}),false,true); return;
   }
   let stream=null;
   try{
-    const c=ac();
+    stopPlay(); stopSynth();                        // never capture our own output
+    audioSession('play-and-record');
+    const c=await acReady();
     stream=await navigator.mediaDevices.getUserMedia({audio:{
       echoCancellation:false, noiseSuppression:false, autoGainControl:false, channelCount:1
     }});

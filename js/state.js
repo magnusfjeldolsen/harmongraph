@@ -37,12 +37,30 @@ function ac(){
   if(S.ac.state==='suspended') S.ac.resume();
   return S.ac;
 }
+/* iOS decides where audio goes, and how loud, from the audio session
+   category. Two of its defaults make a Web Audio app silent with no error
+   and nothing in the console:
+
+   - Web Audio starts in the "ambient" category, which the hardware ring/
+     silent switch mutes. <audio> elements are exempt; an AudioBufferSource
+     into destination is not. A muted phone simply plays nothing.
+   - getUserMedia moves the session to play-and-record, which routes output
+     to the earpiece receiver at low volume — and leaves it there after the
+     mic tracks are stopped, so everything played after a recording is quiet.
+
+   Safari 16.4+ exposes navigator.audioSession, so we can say what we want.
+   Everywhere else this is a no-op. */
+function audioSession(type){
+  try{ if(navigator.audioSession) navigator.audioSession.type=type; }catch(e){}
+}
+
 /* resume() is a promise, and a suspended context's currentTime does not
    advance. Scheduling against that clock silently drops everything, which
    is the usual reason playback "sometimes does nothing" on a phone — iOS
    suspends the context on interruptions and after backgrounding, not only
    before the first gesture. Await this anywhere playback is about to start. */
 async function acReady(){
+  audioSession('playback');        // speaker, and ignore the silent switch
   const c=ac();
   if(c.state!=='running'){ try{ await c.resume(); }catch(e){} }
   return c;
@@ -53,4 +71,4 @@ function setStatus(t,busy,err){
   el.innerHTML=(busy?'<span class="spin"></span>':'')+t;
 }
 
-export {$,clamp,fmtT,yield_,S,noteOn,noteVote,ac,acReady,setStatus};
+export {$,clamp,fmtT,yield_,S,noteOn,noteVote,ac,acReady,audioSession,setStatus};

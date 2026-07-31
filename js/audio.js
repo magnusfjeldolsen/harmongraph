@@ -312,53 +312,124 @@ function rhodesVoice(out,off,L,sr,f0,midi,amp,vel){
   }
 }
 
-function renderChord(rows,voice,useDyn,arpMs){
-  const sr=S.sr, arp=arpMs/1000;
-  const dur=3.0+arp*Math.max(0,rows.length-1);
-  const L=Math.ceil(sr*dur), out=new Float32Array(L);
-  rows.forEach((r,ri)=>{
-    const off=Math.floor(arp*ri*sr);
-    const db=useDyn?Math.max(r.db,-30):-6;
-    const amp=Math.pow(10,db/20);
-    const vel=useDyn?clamp((r.db+42)/42,0.12,1):0.7;
-    const f0=midiFreq(r.midi,S.a4);
-    (voice==='rhodes'?rhodesVoice:pianoVoice)(out,off,L,sr,f0,r.midi,amp,vel);
-  });
-  let mx=0; for(let i=0;i<L;i++){ const a=Math.abs(out[i]); if(a>mx) mx=a; }
-  const g=mx>0?0.82/mx:1, fo=Math.floor(sr*0.09);
-  const trem=voice==='rhodes', dpt=5.2/sr;
-  let tp=0;
+/* ---------------- per-note render cache ----------------
+   One note per buffer, rendered at unit amplitude, cached by voice, pitch
+   and a velocity bucket. Velocity is bucketed because it changes timbre
+   (partial count and rolloff) and so has to be baked in; level does not,
+   and is applied by a gain node at schedule time.
+
+   The point of rendering per note rather than per chord: toggling a note
+   then costs nothing. The next cycle reads noteOn and schedules a
+   different set — no re-render, no restart of the loop. */
+const VEL_BUCKETS=8, CACHE_MAX=24;
+const noteCache=new Map();
+const velBucket=v=>clamp(Math.round(v*(VEL_BUCKETS-1)),0,VEL_BUCKETS-1);
+
+function renderNote(midi,vel,voice){
+  const b=velBucket(vel);
+  const key=voice+'|'+midi+'|'+b+'|'+S.sr+'|'+S.a4.toFixed(2);
+  const hit=noteCache.get(key);
+  if(hit) return hit;
+  const sr=S.sr, L=Math.ceil(sr*3.0), out=new Float32Array(L);
+  (voice==='rhodes'?rhodesVoice:pianoVoice)(out,0,L,sr,midiFreq(midi,S.a4),midi,1,b/(VEL_BUCKETS-1));
+  const fo=Math.floor(sr*0.09);
+  let peak=0;
   for(let i=0;i<L;i++){
-    let v=out[i]*g;
-    if(trem){ v*=1+0.11*sinT(tp); tp+=dpt; if(tp>=1) tp-=1; }
-    if(i>L-fo) v*=(L-i)/fo;
-    out[i]=v;
+    if(i>L-fo) out[i]*=(L-i)/fo;
+    const a=Math.abs(out[i]); if(a>peak) peak=a;
   }
-  return out;
+  const buf=ac().createBuffer(1,L,sr);
+  buf.copyToChannel(out,0);
+  const e={buf,peak:peak||1};
+  if(noteCache.size>=CACHE_MAX) noteCache.delete(noteCache.keys().next().value);
+  noteCache.set(key,e);
+  return e;
 }
+function activeRows(){ return (S.rows||[]).filter(r=>noteOn.has(r.i)); }
+const noteAmp=r=>Math.pow(10,(S.useDyn?Math.max(r.db,-30):-6)/20);
+const noteVel=r=>S.useDyn?clamp((r.db+42)/42,0.12,1):0.7;
 
-/* original selection, then a gap, then the synthesised chord — looped */
-function buildAB(synth){
-  const sr=S.sr;
-  const a=Math.max(0,Math.floor(S.selA*sr));
-  const b=Math.min(S.mono.length,Math.min(Math.floor(S.selB*sr),a+Math.floor(3.2*sr)));
-  const oL=Math.max(1,b-a);
+/* ---------------- lookahead scheduler ----------------
+   Replaces one looping AudioBufferSource. Costs sample-exact loop points
+   and buys live editing: the set is re-read at the top of every cycle, so
+   an edit lands on the next pass instead of restarting playback. */
+const LOOKAHEAD=0.25, TICK_MS=100, GAP=0.3, NOTE_LEN=3.0, ARP=0.110;
+let sched=null, synthKind=null;
+
+function buildChain(){
+  const c=ac();
+  const recOut=c.createGain(); recOut.gain.value=1; recOut.connect(c.destination);
+  const noteOut=c.createGain(); noteOut.gain.value=1; noteOut.connect(c.destination);
+  let lfo=null;
+  if(S.voice==='rhodes'){                    // tremolo belongs on the bus, not baked per note
+    lfo=c.createOscillator(); lfo.frequency.value=5.2;
+    const d=c.createGain(); d.gain.value=0.11;
+    lfo.connect(d).connect(noteOut.gain);
+    lfo.start();
+  }
+  return {recOut,noteOut,lfo};
+}
+function recNorm(){
+  const a=Math.max(0,Math.floor(S.selA*S.sr));
+  const b=Math.min(S.mono.length,Math.min(Math.floor(S.selB*S.sr),a+Math.floor(3.2*S.sr)));
   let mo=0; for(let i=a;i<b;i++){ const v=Math.abs(S.mono[i]); if(v>mo) mo=v; }
-  const go=mo>0?0.82/mo:1;
-  const gap=Math.floor(sr*0.3), fd=Math.floor(sr*0.02);
-  const out=new Float32Array(oL+gap+synth.length+gap);
-  for(let i=0;i<oL;i++){
-    let w=1;
-    if(i<fd) w=i/fd; else if(i>oL-fd) w=(oL-i)/fd;
-    out[i]=S.mono[a+i]*go*w;
-  }
-  out.set(synth,oL+gap);
-  return out;
+  return {gain:mo>0?0.82/mo:1, off:a/S.sr, len:Math.max(0.05,(b-a)/S.sr)};
 }
-
-let synthSrc=null, synthKind=null, synthCache={};
+function scheduleCycle(t0){
+  const c=ac(), rows=activeRows();
+  if(!rows.length) return NOTE_LEN;
+  let tN=t0, lead=0;
+  if(synthKind==='ab'){
+    const R=recNorm();
+    const s=c.createBufferSource(); s.buffer=S.buf;
+    const g=c.createGain();
+    g.gain.setValueAtTime(0,t0);
+    g.gain.linearRampToValueAtTime(R.gain,t0+0.02);
+    g.gain.setValueAtTime(R.gain,t0+R.len-0.02);
+    g.gain.linearRampToValueAtTime(0,t0+R.len);
+    s.connect(g).connect(sched.recOut);
+    s.start(t0,R.off,R.len);
+    track(s);
+    lead=R.len+GAP; tN=t0+lead;
+  }
+  // energy-summed normalisation: peak-of-sum for independent phases is much
+  // closer to sqrt(sum of squares) than to the sum, and this can never be
+  // louder than the old per-mix peak normalisation for a single note
+  const items=rows.map(r=>({e:renderNote(r.midi,noteVel(r),S.voice), amp:noteAmp(r)}));
+  let en=0; items.forEach(it=>{ const p=it.e.peak*it.amp; en+=p*p; });
+  const norm=0.78/Math.max(1e-6,Math.sqrt(en));
+  const arp=synthKind==='arp'?ARP:0;
+  items.forEach((it,k)=>{
+    const s=c.createBufferSource(); s.buffer=it.e.buf;
+    const g=c.createGain(); g.gain.value=it.amp*norm;
+    s.connect(g).connect(sched.noteOut);
+    s.start(tN+arp*k);
+    track(s);
+  });
+  return lead+NOTE_LEN+arp*(rows.length-1)+(synthKind==='ab'?GAP:0);
+}
+function pump(){
+  if(!sched) return;
+  const c=ac();
+  let guard=0;
+  while(sched.nextAt<c.currentTime+LOOKAHEAD && guard++<8){
+    const len=scheduleCycle(sched.nextAt);
+    sched.nextAt+=Math.max(0.25,len);
+  }
+}
+/* keep the stop-list from growing without bound over a long loop */
+function track(s){
+  sched.nodes.push(s);
+  s.onended=()=>{ if(!sched) return; const i=sched.nodes.indexOf(s); if(i>=0) sched.nodes.splice(i,1); };
+}
 function stopSynth(){
-  if(synthSrc){ try{synthSrc.stop();}catch(e){} synthSrc.disconnect(); synthSrc=null; }
+  if(sched){
+    clearInterval(sched.timer);
+    sched.nodes.forEach(n=>{ try{n.stop();}catch(e){} try{n.disconnect();}catch(e){} });
+    if(sched.lfo){ try{sched.lfo.stop();}catch(e){} }
+    try{ sched.recOut.disconnect(); sched.noteOut.disconnect(); }catch(e){}
+    sched=null;
+  }
   synthKind=null; updSynthUI();
 }
 function updSynthUI(){
@@ -372,33 +443,29 @@ async function playSynth(kind){
   const was=synthKind;
   stopPlay(); stopSynth();
   if(was===kind) return;
-  const rows=(S.rows||[]).filter(r=>noteOn.has(r.i));
+  const rows=activeRows();
   if(!rows.length){ setStatus('Tick at least one note to play it back.',false,true); return; }
-  const key=[S.voice,S.useDyn,kind,rows.map(r=>r.midi).join('.')].join('|');
-  let buf=synthCache[key];
-  if(!buf){
+  const c=ac();
+  const cold=rows.filter(r=>!noteCache.has(S.voice+'|'+r.midi+'|'+velBucket(noteVel(r))+'|'+S.sr+'|'+S.a4.toFixed(2)));
+  if(cold.length){
     setStatus('Rendering '+(S.voice==='rhodes'?'Rhodes':'piano')+' …',true);
     await yield_();
-    let pcm=renderChord(rows,S.voice,S.useDyn,kind==='arp'?110:0);
-    if(kind==='ab') pcm=buildAB(pcm);
-    buf=ac().createBuffer(1,pcm.length,S.sr);
-    buf.copyToChannel(pcm,0);
-    synthCache[key]=buf;
+    for(const r of cold){ renderNote(r.midi,noteVel(r),S.voice); await yield_(); }
   }
-  const c=ac(), s=c.createBufferSource();
-  s.buffer=buf; s.loop=true;
-  s.connect(c.destination); s.start();
-  synthSrc=s; synthKind=kind; updSynthUI();
+  synthKind=kind;
+  sched={...buildChain(), nodes:[], nextAt:c.currentTime+0.06, timer:null};
+  pump();
+  sched.timer=setInterval(pump,TICK_MS);
+  updSynthUI();
   const names=rows.map(r=>r.name).join(' ');
   $('#synthInfo').textContent=names;
   setStatus(kind==='ab'
     ? 'Looping: recording → silence → resynthesis. Same voicing?'
     : 'Playing '+names+(S.useDyn?' at measured levels.':' at equal level.'));
 }
-/* synthKind and synthCache are module-local because they are reassigned;
-   an ES module cannot assign to an imported binding, so the two places
-   outside this file that need to touch them go through these. */
-function clearSynthCache(){ synthCache={}; }
+/* Toggling a note no longer needs to touch playback at all — the next cycle
+   reads noteOn. Only a change that invalidates the rendered notes or the
+   bus does, which is the voice and the dynamics mode. */
 function restartSynth(){ if(synthKind){ const k=synthKind; synthKind=null; playSynth(k); } }
 $('#synthPlay').onclick=()=>playSynth('chord');
 $('#synthArp').onclick=()=>playSynth('arp');
@@ -406,14 +473,14 @@ $('#abBtn').onclick=()=>playSynth('ab');
 $('#dynBtn').onclick=e=>{
   S.useDyn=!S.useDyn; e.target.classList.toggle('on',S.useDyn);
   e.target.textContent=S.useDyn?'Measured dynamics':'Equal level';
-  if(synthKind){ const k=synthKind; synthKind=null; playSynth(k); }
+  restartSynth();
 };
 document.querySelectorAll('.voice').forEach(b=>{
   b.onclick=()=>{
     document.querySelectorAll('.voice').forEach(x=>x.classList.remove('on'));
     b.classList.add('on'); S.voice=b.dataset.voice;
-    if(synthKind){ const k=synthKind; synthKind=null; playSynth(k); }
+    restartSynth();
   };
 });
 
-export {startPlay,buildIso,clearSynthCache,restartSynth};
+export {startPlay,buildIso,renderNote,activeRows,noteVel};

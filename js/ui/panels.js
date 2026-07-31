@@ -11,7 +11,7 @@ import {idChord,chordLabel} from '../chords.js';
 import {fitCanvas,dynColor} from './canvas.js';
 import {drawKeys} from './keyboard.js';
 import {drawSpec} from './spectrum.js';
-import {buildIso,startPlay,clearSynthCache,restartSynth} from '../audio.js';
+import {buildIso,startPlay} from '../audio.js';
 
 /* the same selection analyzeSegment() applies, re-run live so the
    threshold slider needs no refit */
@@ -39,7 +39,7 @@ function renderResult(){
   // decision survives the threshold slider recomputing the candidate list.
   noteOn.clear();
   rows.forEach(r=>{ if(noteVote.get(r.i)!==false) noteOn.add(r.i); });
-  S.rows=rows; clearSynthCache();
+  S.rows=rows;
 
   // ---- chord ----
   const pcv=new Array(12).fill(0);
@@ -82,10 +82,11 @@ function renderResult(){
       '<td></td>';
     const cb=document.createElement('input');
     cb.type='checkbox'; cb.checked=noteOn.has(r.i);
+    // no re-render and no restart: the scheduler re-reads noteOn at the top
+    // of the next cycle, so the edit lands on the next pass without a stutter
     cb.onchange=()=>{ noteVote.set(r.i,cb.checked);
       cb.checked?noteOn.add(r.i):noteOn.delete(r.i);
-      delete S.isoBufs.notes; clearSynthCache();
-      restartSynth();
+      delete S.isoBufs.notes;
       if(S.iso==='notes'){ buildIso('notes').then(()=>{ if(S.playing) startPlay(); }); } };
     tr.lastElementChild.appendChild(cb);
     tb.appendChild(tr);

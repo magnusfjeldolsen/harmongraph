@@ -246,10 +246,23 @@ async function buildIso(kind){
     out=istft(applyMask(Sn,M,false),sig.length);
   }
   if(!out) return;
-  const b=c.createBuffer(1,out.length,S.sr);
-  b.copyToChannel(out,0);
+  // Every layer is a masked subset of the original spectrum and so carries a
+  // fraction of its energy — the harmonic comb especially, which keeps only
+  // ±50 cents around each partial. Played through at unity these were far
+  // quieter than the recording, which reads as the layer being broken rather
+  // than as it being a subset. Match the recording's level instead, capping
+  // the makeup gain so a nearly empty layer amplifies its own numerical noise
+  // rather than exploding.
+  // Copy first: for 'harm' and 'perc', out is a reference into S.ana, and
+  // scaling in place would quietly corrupt the stored analysis.
+  const pcm=Float32Array.from(out);
+  let mx=0; for(let i=0;i<pcm.length;i++){ const a=Math.abs(pcm[i]); if(a>mx) mx=a; }
+  let g=1;
+  if(mx>0){ g=Math.min(0.89/mx,32); for(let i=0;i<pcm.length;i++) pcm[i]*=g; }
+  const b=c.createBuffer(1,pcm.length,S.sr);
+  b.copyToChannel(pcm,0);
   S.isoBufs[kind]=b;
-  setStatus('Layer ready — press play.');
+  setStatus('Layer ready — press play.'+(g>1.5?' Raised '+(20*Math.log10(g)).toFixed(0)+' dB to match the recording.':''));
 }
 
 /* ============================================================

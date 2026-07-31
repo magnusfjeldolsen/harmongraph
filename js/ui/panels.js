@@ -11,7 +11,7 @@ import {idChord,chordLabel} from '../chords.js';
 import {fitCanvas,dynColor} from './canvas.js';
 import {drawKeys} from './keyboard.js';
 import {drawSpec} from './spectrum.js';
-import {buildIso,startPlay,previewNote} from '../audio.js';
+import {buildIso,startPlay,previewNote,setPickMode} from '../audio.js';
 
 /* the same selection analyzeSegment() applies, re-run live so the
    threshold slider needs no refit */
@@ -88,6 +88,10 @@ function renderResult(){
     cb.onchange=()=>{ noteVote.set(r.i,cb.checked);
       cb.checked?noteOn.add(r.i):noteOn.delete(r.i);
       delete S.isoBufs.notes;
+      // Touching a tick means you want your picks to count. Without this the
+      // box would visibly change while playback carried on unaltered, because
+      // All-detected mode ignores the ticks.
+      if(S.playAll){ setPickMode(false); return; }
       if(S.iso==='notes'){ buildIso('notes').then(()=>{ if(S.playing) startPlay(); }); } };
     tr.lastElementChild.appendChild(cb);
     // Tap the name to hear that note alone. Deliberately not the whole row —

@@ -119,9 +119,13 @@
   </div>
 
   <div class="panel-hd" style="border-top:1px solid var(--line)">
-    <span class="eyebrow">Voicing</span><span class="eyebrow">solo →</span>
+    <span class="eyebrow">Voicing</span>
+    <span class="seg" style="margin-left:auto">
+      <button id="pickAll" class="on">All detected</button><button id="pickMine">My picks</button>
+    </span>
   </div>
   <div class="panel-bd" style="padding:8px 12px">
+    <div class="hint" id="pickHint" style="margin-bottom:8px">Tap a note name to hear it alone. Tick notes to build your own version, then switch to <b>My picks</b>.</div>
     <table id="noteTbl">
       <thead><tr><th>Note</th><th>Hz</th><th style="width:26%">Level</th><th style="width:22%">Real</th><th style="width:34px"></th></tr></thead>
       <tbody></tbody>

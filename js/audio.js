@@ -269,9 +269,9 @@ async function buildIso(kind){
     const Sn=F.Sf||stft(sig,n,hop);
     const K=Sn.K, df=S.sr/Sn.n;
     const keep=new Float32Array(K);
-    // only notes in the current analysis — noteOn is keyed by pitch and can
-    // still hold picks from an earlier chord
-    const list=(S.rows||[]).filter(r=>noteOn.has(r.i)).map(r=>r.i);
+    // same set the chord plays, so the layer and the resynthesis never
+    // disagree about what "the chord" currently means
+    const list=activeRows().map(r=>r.i);
     if(!list.length){ setStatus('Tick at least one note to solo it.',false,true); return; }
     list.forEach(i=>{
       const f0=midiFreq(NOTE_LO+i,S.a4);
@@ -423,7 +423,13 @@ function renderNote(midi,vel,voice){
   noteCache.set(key,e);
   return e;
 }
-function activeRows(){ return (S.rows||[]).filter(r=>noteOn.has(r.i)); }
+/* What "the chord" means for playback and for the harmonic-comb isolation.
+   In All-detected mode the ticks are ignored but kept, so switching back to
+   My picks restores them untouched. */
+function activeRows(){
+  const rows=S.rows||[];
+  return S.playAll ? rows.slice() : rows.filter(r=>noteOn.has(r.i));
+}
 const noteAmp=r=>Math.pow(10,(S.useDyn?Math.max(r.db,-30):-6)/20);
 const noteVel=r=>S.useDyn?clamp((r.db+42)/42,0.12,1):0.7;
 
@@ -587,6 +593,24 @@ async function previewNote(row){
    reads noteOn. Only a change that invalidates the rendered notes or the
    bus does, which is the voice and the dynamics mode. */
 function restartSynth(){ if(synthKind){ const k=synthKind; synthKind=null; playSynth(k); } }
+/* All detected vs My picks. Switching only changes which set counts — the
+   ticks are never rewritten, so you can flip back and forth freely. The
+   isolation layer is rebuilt because it is cut from the same set. */
+function setPickMode(all){
+  if(S.playAll===all) return;
+  S.playAll=all;
+  $('#pickAll').classList.toggle('on',all);
+  $('#pickMine').classList.toggle('on',!all);
+  delete S.isoBufs.notes;
+  const n=activeRows().length;
+  setStatus(all
+    ? 'Playing all '+n+' detected note'+(n===1?'':'s')+'. Your ticks are kept.'
+    : 'Playing your '+n+' ticked note'+(n===1?'':'s')+'.');
+  if(synthKind) restartSynth();
+  if(S.iso==='notes'){ buildIso('notes').then(()=>{ if(S.playing) startPlay(); }); }
+}
+$('#pickAll').onclick=()=>setPickMode(true);
+$('#pickMine').onclick=()=>setPickMode(false);
 $('#synthPlay').onclick=()=>playSynth('chord');
 $('#synthArp').onclick=()=>playSynth('arp');
 $('#abBtn').onclick=()=>playSynth('ab');
@@ -603,4 +627,4 @@ document.querySelectorAll('.voice').forEach(b=>{
   };
 });
 
-export {startPlay,buildIso,renderNote,activeRows,noteVel,previewNote};
+export {startPlay,buildIso,renderNote,activeRows,noteVel,previewNote,setPickMode};

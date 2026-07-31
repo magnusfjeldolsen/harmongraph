@@ -62,6 +62,15 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 button.pri{background:var(--cy-dim);border-color:var(--cy);color:#eaf7fa}
 button.pri:hover:not(:disabled){background:#3a7484}
 button.on{background:var(--cy-dim);border-color:var(--cy);color:#eaf7fa}
+/* two mutually exclusive choices, joined so they read as one control */
+.seg{display:inline-flex}
+.seg button{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+  padding:5px 9px;border-radius:0;
+}
+.seg button:first-child{border-radius:var(--r) 0 0 var(--r)}
+.seg button:last-child{border-radius:0 var(--r) var(--r) 0;border-left-width:0}
+.seg button:last-child.on{border-left-width:1px}
 button.rec{border-color:#a24a4a;color:#f0b5b5}
 button.rec.armed{background:#7d2f2f;border-color:#c96060;color:#fff}
 .mini{padding:6px 9px;font-size:12px}

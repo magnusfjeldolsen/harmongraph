@@ -19,6 +19,10 @@ const S={
   iso:'full', isoBufs:{},
   ana:null, hpss:true, thr:0.12, a4:440, fftN:16384, decay:0.72,
   GATE:0.08, NMS:1.5, voice:'piano', useDyn:true, rows:null,
+  // playAll: play everything the detector found, ignoring the ticks without
+  // clearing them, so you can flip between the algorithm's answer and your
+  // own and back again without re-ticking anything
+  playAll:true,
   rec:null
 };
 

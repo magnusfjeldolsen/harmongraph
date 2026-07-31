@@ -94,6 +94,7 @@ check('notes scheduled on the first cycle',srcs().length,5);
 check('all struck together',new Set(srcs().map(n=>n._start.toFixed(4))).size,1);
 
 console.log('\nediting a running loop');
+S.playAll=false;                         // assert on the picks path, not All-detected
 let n0=srcs().length;
 noteOn.delete(43);                       // untick E4 mid-loop
 NOW=3.1; pump();
@@ -160,6 +161,26 @@ check('starting the recording stops the chord',el('#synthPlay').textContent,'▶
 check('recording is playing again',S.playing,true);
 el('#playBtn').onclick(); await flush();
 check('and stops',S.playing,false);
+
+/* All detected vs My picks. The whole point is being able to flip back and
+   forth without re-ticking, so switching must never rewrite the ticks. */
+console.log('\nswitching between all detected and my picks');
+S.rows=ROWS();
+noteOn.clear(); S.rows.forEach(r=>noteOn.add(r.i));
+noteOn.delete(43); noteOn.delete(53);           // user unticks two
+S.playAll=false;
+started.length=0; NOW=80;
+await el('#synthPlay').onclick(); await flush();
+check('my picks plays only the ticked notes',srcs().length,3);
+started.length=0;
+el('#pickAll').onclick(); await flush();        // restarts the loop itself
+check('all detected plays every note',srcs().length,5);
+check('and the ticks survive the switch',noteOn.size,3);
+started.length=0;
+el('#pickMine').onclick(); await flush();
+check('switching back restores the picks',srcs().length,3);
+check('with nothing re-ticked by hand',noteOn.size,3);
+await el('#synthPlay').onclick(); await flush();
 
 /* Tapping a note name auditions that note alone. The point is inspecting the
    chord one participant at a time, so it must silence everything else — the

@@ -62,16 +62,21 @@ globalThis.requestAnimationFrame=()=>0;
 const flush=async()=>{ for(let i=0;i<8;i++) await Promise.resolve(); await new Promise(r=>setTimeout(r,0)); };
 
 const {S,noteOn,noteVote}=await import('../js/state.js');
-await import('../js/audio.js');
+const audio=await import('../js/audio.js');
 
 S.sr=44100; S.a4=440; S.voice='piano'; S.useDyn=true;
 S.dur=3; S.selA=0; S.selB=2; S.mono=new Float32Array(44100*3); S.buf={};
 S.pkSize=256;                                  // drawWave() reads the peak pyramid
 { const cnt=Math.ceil(S.mono.length/S.pkSize);
   S.peaks={mn:new Float32Array(cnt), mx:new Float32Array(cnt), cnt}; }
-S.rows=[{i:39,midi:60,name:'C4',db:0},  {i:43,midi:64,name:'E4',db:-4},
-        {i:46,midi:67,name:'G4',db:-6}, {i:50,midi:71,name:'B4',db:-9},
-        {i:53,midi:74,name:'D5',db:-12}];
+// the shape renderResult() builds, including the fields previewNote reads
+const ROWS=()=>[
+  {i:39,midi:60,name:'C4',db:0,   f:261.6,pf:0.82},
+  {i:43,midi:64,name:'E4',db:-4,  f:329.6,pf:0.71},
+  {i:46,midi:67,name:'G4',db:-6,  f:392.0,pf:0.66},
+  {i:50,midi:71,name:'B4',db:-9,  f:493.9,pf:0.58},
+  {i:53,midi:74,name:'D5',db:-12, f:587.3,pf:0.44}];
+S.rows=ROWS();
 noteOn.clear(); S.rows.forEach(r=>noteOn.add(r.i));
 
 const pump=()=>intervals.forEach(f=>f());
@@ -156,6 +161,22 @@ check('recording is playing again',S.playing,true);
 el('#playBtn').onclick(); await flush();
 check('and stops',S.playing,false);
 
+/* Tapping a note name auditions that note alone. The point is inspecting the
+   chord one participant at a time, so it must silence everything else — the
+   chord loop especially, which would otherwise be sounding that same note. */
+console.log('\nauditioning a single note');
+started.length=0; stopped.length=0; NOW=70;
+await el('#synthPlay').onclick(); await flush();
+check('chord loop running first',el('#synthPlay').textContent,'■ Stop');
+started.length=0;
+await audio.previewNote(S.rows[1]); await flush();
+check('the chord loop is stopped',el('#synthPlay').textContent,'▶ Play chord');
+check('exactly one note sounds',srcs().length,1);
+started.length=0;
+await audio.previewNote(S.rows[2]); await flush();
+check('a second tap replaces the first',srcs().length,1);
+check('and stops the previous preview',stopped.length>0,true);
+
 /* Loading new audio has to be a clean slate. Anything derived from the old
    take that survives shows up as a bug that looks unrelated to loading:
    the previous recording keeps sounding, "Play chord" plays the previous
@@ -176,9 +197,7 @@ check('stale analysis frames cleared',S._fine,null);
 check('view resets to the whole file',S.viewA,0);
 
 console.log('\nand the button still works afterwards');
-S.rows=[{i:39,midi:60,name:'C4',db:0},  {i:43,midi:64,name:'E4',db:-4},
-        {i:46,midi:67,name:'G4',db:-6}, {i:50,midi:71,name:'B4',db:-9},
-        {i:53,midi:74,name:'D5',db:-12}];
+S.rows=ROWS();
 noteOn.clear(); S.rows.forEach(r=>noteOn.add(r.i));
 started.length=0; NOW=40;
 await el('#synthPlay').onclick();

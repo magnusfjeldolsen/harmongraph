@@ -11,7 +11,7 @@ import {idChord,chordLabel} from '../chords.js';
 import {fitCanvas,dynColor} from './canvas.js';
 import {drawKeys} from './keyboard.js';
 import {drawSpec} from './spectrum.js';
-import {buildIso,startPlay} from '../audio.js';
+import {buildIso,startPlay,previewNote} from '../audio.js';
 
 /* the same selection analyzeSegment() applies, re-run live so the
    threshold slider needs no refit */
@@ -72,7 +72,8 @@ function renderResult(){
     const tr=document.createElement('tr');
     const lvl=clamp((r.db+48)/48,0,1);
     tr.innerHTML=
-      '<td class="n" style="color:'+dynColor(r.db,1)+'">'+r.name+
+      '<td class="n tap" role="button" tabindex="0" title="Play this note on its own"'+
+        ' style="color:'+dynColor(r.db,1)+'">'+r.name+
         (r.pf<0.45?' <span class="pill">ovt</span>':'')+'</td>'+
       '<td style="color:var(--dim)">'+r.f.toFixed(1)+'</td>'+
       '<td><div class="bar"><i style="width:'+(lvl*100).toFixed(0)+'%;background:'+dynColor(r.db,1)+'"></i></div>'+
@@ -89,6 +90,14 @@ function renderResult(){
       delete S.isoBufs.notes;
       if(S.iso==='notes'){ buildIso('notes').then(()=>{ if(S.playing) startPlay(); }); } };
     tr.lastElementChild.appendChild(cb);
+    // Tap the name to hear that note alone. Deliberately not the whole row —
+    // the row's other end is the include/exclude checkbox, and a tap target
+    // that both auditions and toggles depending on where it landed would be
+    // the worst of both.
+    const nameCell=tr.firstElementChild;
+    const play=e=>{ e.preventDefault(); previewNote(r); };
+    nameCell.onclick=play;
+    nameCell.onkeydown=e=>{ if(e.key==='Enter'||e.key===' ') play(e); };
     tb.appendChild(tr);
   });
   if(!rows.length) tb.innerHTML='<tr><td colspan="5" style="color:var(--dim)">Nothing above threshold. Lower it, or fence a louder / more sustained part.</td></tr>';

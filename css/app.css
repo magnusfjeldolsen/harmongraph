@@ -146,6 +146,20 @@ th{
 td{padding:7px 6px;border-bottom:1px solid #1c272e;vertical-align:middle}
 tr:last-child td{border-bottom:none}
 td.n{font-weight:600;font-size:14px}
+/* the note name auditions that note on its own */
+td.n.tap{
+  cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
+  -webkit-tap-highlight-color:transparent;position:relative;
+  padding-left:20px;                     /* room for the play glyph */
+}
+td.n.tap::before{
+  content:'';position:absolute;left:6px;top:50%;margin-top:-4px;
+  border-left:7px solid currentColor;border-top:4px solid transparent;
+  border-bottom:4px solid transparent;opacity:.45;transition:opacity .12s;
+}
+td.n.tap:hover::before,td.n.tap:focus-visible::before{opacity:1}
+td.n.tap:active{opacity:.55}
+td.n.tap:focus-visible{outline:1px solid var(--cy);outline-offset:-1px;border-radius:3px}
 .bar{height:7px;border-radius:2px;background:#0b1014;overflow:hidden;min-width:42px}
 .bar i{display:block;height:100%;border-radius:2px}
 .pill{

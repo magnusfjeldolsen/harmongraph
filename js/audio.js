@@ -556,6 +556,33 @@ async function playSynth(kind){
     ? 'Looping: recording → silence → resynthesis. Same voicing?'
     : 'Playing '+names+(S.useDyn?' at measured levels.':' at equal level.'));
 }
+/* Tap a note name to hear that note on its own — the point is inspecting the
+   chord one participant at a time, so this stops whatever else is sounding
+   rather than layering over it.
+
+   It is the same cached buffer the loop uses, at the same velocity, so the
+   timbre cannot disagree with what the chord plays. The level deliberately
+   does not match: a note measured at -30 dB would be inaudible soloed, and
+   you can already read its level off the bar. The status line states the
+   measured figure instead, so nothing is hidden. */
+let previewSrc=null, previewSeq=0;
+async function previewNote(row){
+  stopPlay(); stopSynth();
+  if(previewSrc){ try{ previewSrc.stop(); }catch(e){} previewSrc=null; }
+  const seq=++previewSeq;
+  const c=await acReady();
+  if(seq!==previewSeq) return;
+  const e=renderNote(row.midi,noteVel(row),S.voice);
+  if(seq!==previewSeq) return;
+  const s=c.createBufferSource(); s.buffer=e.buf;
+  const g=c.createGain(); g.gain.value=0.85/e.peak;
+  s.connect(g).connect(c.destination);
+  s.start();
+  previewSrc=s;
+  s.onended=()=>{ if(previewSrc===s) previewSrc=null; };
+  setStatus(row.name+' · '+row.f.toFixed(1)+' Hz · '+row.db.toFixed(0)
+    +' dB in the chord · '+(row.pf*100).toFixed(0)+'% real');
+}
 /* Toggling a note no longer needs to touch playback at all — the next cycle
    reads noteOn. Only a change that invalidates the rendered notes or the
    bus does, which is the voice and the dynamics mode. */
@@ -576,4 +603,4 @@ document.querySelectorAll('.voice').forEach(b=>{
   };
 });
 
-export {startPlay,buildIso,renderNote,activeRows,noteVel};
+export {startPlay,buildIso,renderNote,activeRows,noteVel,previewNote};

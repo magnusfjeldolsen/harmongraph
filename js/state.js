@@ -26,6 +26,12 @@ const S={
    resynthesis and by the harmonic-comb isolation */
 let noteOn=new Set();
 
+/* an explicit decision the user made about a note, index -> boolean.
+   noteOn is derived from this on every render, so a note you switched off
+   stays off when the threshold slider recomputes the candidate list. Absent
+   means "no opinion", and the default applies. Cleared on a new analysis. */
+let noteVote=new Map();
+
 function ac(){
   if(!S.ac) S.ac=new (window.AudioContext||window.webkitAudioContext)();
   if(S.ac.state==='suspended') S.ac.resume();
@@ -37,4 +43,4 @@ function setStatus(t,busy,err){
   el.innerHTML=(busy?'<span class="spin"></span>':'')+t;
 }
 
-export {$,clamp,fmtT,yield_,S,noteOn,ac,setStatus};
+export {$,clamp,fmtT,yield_,S,noteOn,noteVote,ac,setStatus};

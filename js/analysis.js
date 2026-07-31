@@ -2,7 +2,7 @@
    MAIN ANALYSIS — the pipeline that runs on the fenced selection,
    plus the concert-pitch estimator that shares its slicing.
    ============================================================ */
-import {$,S,clamp,setStatus,yield_,noteOn} from './state.js';
+import {$,S,clamp,setStatus,yield_,noteOn,noteVote} from './state.js';
 import {stft,magOf} from './dsp/fft.js';
 import {analyzeSegment} from './analyzeSegment.js';
 import {renderResult} from './ui/panels.js';
@@ -67,10 +67,11 @@ async function analyze(){
            yraw:R.yraw,yw:R.yw,recon:R.recon,fundBin:R.fundBin,
            ms:(performance.now()-t0)|0,
            hpss:S.hpss,harm:R.harm,perc:R.perc,n};
-    // a new fit means a new set of notes to choose from; renderResult() only
-    // seeds the default picks when this is empty, so without clearing it here
-    // every analysis after the first inherits the previous chord's ticks
-    noteOn.clear();
+    // a new fit means a new set of notes to choose from, so the previous
+    // chord's picks and the decisions behind them both go. renderResult()
+    // rebuilds noteOn from noteVote, so clearing the votes is what actually
+    // resets the selection.
+    noteOn.clear(); noteVote.clear();
     renderResult();
     setStatus('Done in '+S.ana.ms+' ms · window '+n+' · A₄ '+S.a4.toFixed(1)+' Hz'+(S.hpss?' · percussion stripped':''));
   }catch(err){

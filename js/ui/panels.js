@@ -3,7 +3,7 @@
    the surviving notes, the chord name, the key map, the spectrum
    overlay and the voicing table. Re-runs on its own whenever the
    note threshold moves — no refit needed. */
-import {$,S,clamp,noteOn} from '../state.js';
+import {$,S,clamp,noteOn,noteVote} from '../state.js';
 import {midiName,midiFreq} from '../pitch.js';
 import {NOTE_LO} from '../dsp/nnls.js';
 import {selectNotes} from '../analyzeSegment.js';
@@ -32,7 +32,13 @@ function renderResult(){
             f:midiFreq(NOTE_LO+i,S.a4), db:Math.max(-60,db),
             pf:A.pfund[i], det:A.detN[i]};
   });
-  if(noteOn.size===0) rows.forEach(r=>{ if(r.pf>0.5) noteOn.add(r.i); });
+  // Every detected note starts on. The old seed was `pf > 0.5`, which handed
+  // the default to a number handoff.md §2 measures as weak (gap 0.12) and
+  // inverted on one of six timbres — so it silently dropped real notes.
+  // noteOn is rebuilt from scratch here rather than seeded once, so a user's
+  // decision survives the threshold slider recomputing the candidate list.
+  noteOn.clear();
+  rows.forEach(r=>{ if(noteVote.get(r.i)!==false) noteOn.add(r.i); });
   S.rows=rows; clearSynthCache();
 
   // ---- chord ----
@@ -76,7 +82,8 @@ function renderResult(){
       '<td></td>';
     const cb=document.createElement('input');
     cb.type='checkbox'; cb.checked=noteOn.has(r.i);
-    cb.onchange=()=>{ cb.checked?noteOn.add(r.i):noteOn.delete(r.i);
+    cb.onchange=()=>{ noteVote.set(r.i,cb.checked);
+      cb.checked?noteOn.add(r.i):noteOn.delete(r.i);
       delete S.isoBufs.notes; clearSynthCache();
       restartSynth();
       if(S.iso==='notes'){ buildIso('notes').then(()=>{ if(S.playing) startPlay(); }); } };

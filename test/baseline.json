@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-29",
+  "generated": "2026-07-31",
   "node": "v22.18.0",
   "opts": {
     "a4": 440,
@@ -21,115 +21,115 @@
   "timbres": {
     "geometric": {
       "recall": 0.8911,
-      "precision": 0.7143,
-      "f1": 0.793,
-      "oct": 12,
-      "fifth": 18,
-      "other": 6,
+      "precision": 0.9184,
+      "f1": 0.9045,
+      "oct": 3,
+      "fifth": 5,
+      "other": 0,
       "miss": 11,
-      "ghosts": 36,
-      "pfHit": 0.7787,
-      "pfGhost": 0.7405,
-      "confGap": 0.0383,
-      "msMean": 149.6,
-      "msMax": 245.2,
+      "ghosts": 8,
+      "pfHit": 0.7784,
+      "pfGhost": 0.4114,
+      "confGap": 0.367,
+      "msMean": 104.2,
+      "msMax": 161.8,
       "chords": 22
     },
     "bright": {
-      "recall": 0.8515,
-      "precision": 0.4503,
-      "f1": 0.589,
-      "oct": 51,
-      "fifth": 32,
-      "other": 22,
-      "miss": 15,
-      "ghosts": 105,
-      "pfHit": 0.818,
-      "pfGhost": 0.6121,
-      "confGap": 0.2058,
-      "msMean": 147.6,
-      "msMax": 205.8,
+      "recall": 0.8416,
+      "precision": 0.6343,
+      "f1": 0.7234,
+      "oct": 25,
+      "fifth": 21,
+      "other": 3,
+      "miss": 16,
+      "ghosts": 49,
+      "pfHit": 0.8397,
+      "pfGhost": 0.4111,
+      "confGap": 0.4286,
+      "msMean": 101.6,
+      "msMax": 109.7,
       "chords": 22
     },
     "dark": {
-      "recall": 0.901,
-      "precision": 0.5987,
-      "f1": 0.7194,
-      "oct": 20,
-      "fifth": 18,
-      "other": 23,
-      "miss": 10,
-      "ghosts": 61,
-      "pfHit": 0.6836,
-      "pfGhost": 0.8883,
-      "confGap": -0.2047,
-      "msMean": 139.3,
-      "msMax": 158.4,
+      "recall": 0.8911,
+      "precision": 0.9783,
+      "f1": 0.9326,
+      "oct": 1,
+      "fifth": 1,
+      "other": 0,
+      "miss": 11,
+      "ghosts": 2,
+      "pfHit": 0.6842,
+      "pfGhost": 0.3256,
+      "confGap": 0.3586,
+      "msMean": 100.6,
+      "msMax": 105.6,
       "chords": 22
     },
     "hollow": {
-      "recall": 0.8812,
-      "precision": 0.4917,
-      "f1": 0.6312,
-      "oct": 23,
-      "fifth": 51,
-      "other": 18,
-      "miss": 12,
-      "ghosts": 92,
-      "pfHit": 0.7785,
-      "pfGhost": 0.5845,
-      "confGap": 0.194,
-      "msMean": 142.3,
-      "msMax": 163.4,
+      "recall": 0.8713,
+      "precision": 0.6667,
+      "f1": 0.7554,
+      "oct": 4,
+      "fifth": 35,
+      "other": 5,
+      "miss": 13,
+      "ghosts": 44,
+      "pfHit": 0.7904,
+      "pfGhost": 0.3628,
+      "confGap": 0.4276,
+      "msMean": 101.9,
+      "msMax": 118.2,
       "chords": 22
     },
     "formant": {
-      "recall": 0.8317,
-      "precision": 0.3889,
-      "f1": 0.53,
-      "oct": 67,
-      "fifth": 44,
-      "other": 21,
-      "miss": 17,
-      "ghosts": 132,
-      "pfHit": 0.8222,
-      "pfGhost": 0.577,
-      "confGap": 0.2452,
-      "msMean": 147.4,
-      "msMax": 191.3,
+      "recall": 0.8515,
+      "precision": 0.4831,
+      "f1": 0.6165,
+      "oct": 58,
+      "fifth": 29,
+      "other": 5,
+      "miss": 15,
+      "ghosts": 92,
+      "pfHit": 0.8507,
+      "pfGhost": 0.3811,
+      "confGap": 0.4696,
+      "msMean": 101.4,
+      "msMax": 111.2,
       "chords": 22
     },
     "inharmonic": {
-      "recall": 0.9109,
-      "precision": 0.6301,
-      "f1": 0.7449,
-      "oct": 25,
-      "fifth": 18,
-      "other": 11,
-      "miss": 9,
-      "ghosts": 54,
-      "pfHit": 0.7827,
-      "pfGhost": 0.7365,
-      "confGap": 0.0462,
-      "msMean": 136.6,
-      "msMax": 162.5,
+      "recall": 0.9208,
+      "precision": 0.8692,
+      "f1": 0.8942,
+      "oct": 8,
+      "fifth": 6,
+      "other": 0,
+      "miss": 8,
+      "ghosts": 14,
+      "pfHit": 0.795,
+      "pfGhost": 0.3254,
+      "confGap": 0.4696,
+      "msMean": 102.6,
+      "msMax": 119.4,
       "chords": 22
     }
   },
   "overall": {
     "recall": 0.8779,
-    "precision": 0.5257,
-    "f1": 0.6576,
-    "oct": 198,
-    "fifth": 181,
-    "other": 101,
+    "precision": 0.7179,
+    "f1": 0.7899,
+    "oct": 99,
+    "fifth": 97,
+    "other": 13,
     "miss": 74,
-    "ghosts": 480,
-    "pfHit": 0.7763,
-    "pfGhost": 0.6559,
-    "confGap": 0.1204,
-    "msMean": 143.8,
-    "msMax": 245.2,
+    "ghosts": 209,
+    "pfHit": 0.7888,
+    "pfGhost": 0.3812,
+    "confGap": 0.4077,
+    "msMean": 102,
+    "msMax": 161.8,
     "chords": 132,
     "notes": 606
   },
@@ -138,18 +138,13 @@
       "id": "geometric/triad-close-Cmaj",
       "timbre": "geometric",
       "voicing": "triad-close-Cmaj",
-      "ms": 245.2,
+      "ms": 161.8,
       "truth": [
         60,
         64,
         67
       ],
       "detected": [
-        21,
-        28,
-        29,
-        32,
-        43,
         60,
         64,
         67
@@ -159,23 +154,17 @@
         64,
         67
       ],
-      "ghosts": [
-        21,
-        28,
-        29,
-        32,
-        43
-      ],
+      "ghosts": [],
       "misses": [],
-      "oct": 2,
-      "fifth": 2,
-      "oth": 1
+      "oct": 0,
+      "fifth": 0,
+      "oth": 0
     },
     {
       "id": "geometric/triad-open-Cmaj",
       "timbre": "geometric",
       "voicing": "triad-open-Cmaj",
-      "ms": 181.8,
+      "ms": 134.4,
       "truth": [
         48,
         55,
@@ -183,12 +172,10 @@
         72
       ],
       "detected": [
-        27,
         48,
         55,
         64,
-        72,
-        91
+        72
       ],
       "hits": [
         48,
@@ -196,20 +183,17 @@
         64,
         72
       ],
-      "ghosts": [
-        27,
-        91
-      ],
+      "ghosts": [],
       "misses": [],
-      "oct": 1,
+      "oct": 0,
       "fifth": 0,
-      "oth": 1
+      "oth": 0
     },
     {
       "id": "geometric/min7-A-close",
       "timbre": "geometric",
       "voicing": "min7-A-close",
-      "ms": 169.2,
+      "ms": 104.5,
       "truth": [
         57,
         60,
@@ -217,9 +201,6 @@
         67
       ],
       "detected": [
-        24,
-        26,
-        27,
         57,
         60,
         64,
@@ -231,21 +212,17 @@
         64,
         67
       ],
-      "ghosts": [
-        24,
-        26,
-        27
-      ],
+      "ghosts": [],
       "misses": [],
-      "oct": 1,
-      "fifth": 1,
-      "oth": 1
+      "oct": 0,
+      "fifth": 0,
+      "oth": 0
     },
     {
       "id": "geometric/dim7-Fs",
       "timbre": "geometric",
       "voicing": "dim7-Fs",
-      "ms": 142.8,
+      "ms": 98.5,
       "truth": [
         54,
         57,
@@ -253,9 +230,6 @@
         63
       ],
       "detected": [
-        26,
-        27,
-        29,
         54,
         57,
         60,
@@ -267,21 +241,17 @@
         60,
         63
       ],
-      "ghosts": [
-        26,
-        27,
-        29
-      ],
+      "ghosts": [],
       "misses": [],
-      "oct": 1,
-      "fifth": 2,
+      "oct": 0,
+      "fifth": 0,
       "oth": 0
     },
     {
       "id": "geometric/dom7-G-low",
       "timbre": "geometric",
       "voicing": "dom7-G-low",
-      "ms": 149.7,
+      "ms": 99.6,
       "truth": [
         43,
         47,
@@ -310,7 +280,7 @@
       "id": "geometric/maj7-C-open",
       "timbre": "geometric",
       "voicing": "maj7-C-open",
-      "ms": 128.3,
+      "ms": 98.6,
       "truth": [
         48,
         55,
@@ -318,7 +288,6 @@
         64
       ],
       "detected": [
-        21,
         48,
         55,
         59,
@@ -330,19 +299,17 @@
         59,
         64
       ],
-      "ghosts": [
-        21
-      ],
+      "ghosts": [],
       "misses": [],
       "oct": 0,
-      "fifth": 1,
+      "fifth": 0,
       "oth": 0
     },
     {
       "id": "geometric/min7-D-close",
       "timbre": "geometric",
       "voicing": "min7-D-close",
-      "ms": 151.7,
+      "ms": 98,
       "truth": [
         50,
         53,
@@ -371,7 +338,7 @@
       "id": "geometric/dom9-F",
       "timbre": "geometric",
       "voicing": "dom9-F",
-      "ms": 140.7,
+      "ms": 96.6,
       "truth": [
         41,
         45,
@@ -403,7 +370,7 @@
       "id": "geometric/dom13-Bb",
       "timbre": "geometric",
       "voicing": "dom13-Bb",
-      "ms": 141.3,
+      "ms": 98.5,
       "truth": [
         46,
         50,
@@ -438,7 +405,7 @@
       "id": "geometric/min11-E-wide",
       "timbre": "geometric",
       "voicing": "min11-E-wide",
-      "ms": 133,
+      "ms": 100.7,
       "truth": [
         40,
         47,
@@ -476,7 +443,7 @@
       "id": "geometric/oct-quad-C",
       "timbre": "geometric",
       "voicing": "oct-quad-C",
-      "ms": 145.2,
+      "ms": 98.4,
       "truth": [
         36,
         48,
@@ -486,29 +453,26 @@
       "detected": [
         36,
         60,
-        72,
-        91
+        72
       ],
       "hits": [
         36,
         60,
         72
       ],
-      "ghosts": [
-        91
-      ],
+      "ghosts": [],
       "misses": [
         48
       ],
       "oct": 0,
-      "fifth": 1,
+      "fifth": 0,
       "oth": 0
     },
     {
       "id": "geometric/oct-triple-E",
       "timbre": "geometric",
       "voicing": "oct-triple-E",
-      "ms": 154.2,
+      "ms": 99.2,
       "truth": [
         40,
         52,
@@ -540,16 +504,13 @@
       "id": "geometric/cluster-semitone",
       "timbre": "geometric",
       "voicing": "cluster-semitone",
-      "ms": 146.5,
+      "ms": 102,
       "truth": [
         60,
         61,
         62
       ],
       "detected": [
-        21,
-        32,
-        42,
         60,
         62
       ],
@@ -557,60 +518,45 @@
         60,
         62
       ],
-      "ghosts": [
-        21,
-        32,
-        42
-      ],
+      "ghosts": [],
       "misses": [
         61
       ],
       "oct": 0,
-      "fifth": 3,
+      "fifth": 0,
       "oth": 0
     },
     {
       "id": "geometric/cluster-C-Cs-G",
       "timbre": "geometric",
       "voicing": "cluster-C-Cs-G",
-      "ms": 146.8,
+      "ms": 105.7,
       "truth": [
         60,
         61,
         67
       ],
       "detected": [
-        24,
-        39,
-        41,
-        42,
         61,
-        67,
-        86
+        67
       ],
       "hits": [
         61,
         67
       ],
-      "ghosts": [
-        24,
-        39,
-        41,
-        42,
-        86
-      ],
+      "ghosts": [],
       "misses": [
         60
       ],
-      "oct": 1,
-      "fifth": 3,
-      "oth": 1
+      "oct": 0,
+      "fifth": 0,
+      "oth": 0
     },
     {
       "id": "geometric/maj9-wide-spread",
       "timbre": "geometric",
       "voicing": "maj9-wide-spread",
-      "ms": 144.4,
+      "ms": 97.9,
       "truth": [
         36,
         55,
@@ -645,7 +591,7 @@
       "id": "geometric/low-bass-E1",
       "timbre": "geometric",
       "voicing": "low-bass-E1",
-      "ms": 124.7,
+      "ms": 98.7,
       "truth": [
         28,
         35,
@@ -677,7 +623,7 @@
       "id": "geometric/low-bass-C1",
       "timbre": "geometric",
       "voicing": "low-bass-C1",
-      "ms": 140.7,
+      "ms": 101.4,
       "truth": [
         24,
         31,
@@ -688,9 +634,7 @@
         24,
         31,
         36,
-        43,
-        106,
-        107
+        43
       ],
       "hits": [
         24,
@@ -698,20 +642,17 @@
         36,
         43
       ],
-      "ghosts": [
-        106,
-        107
-      ],
+      "ghosts": [],
       "misses": [],
       "oct": 0,
       "fifth": 0,
-      "oth": 2
+      "oth": 0
     },
     {
       "id": "geometric/guitar-open-E",
       "timbre": "geometric",
       "voicing": "guitar-open-E",
-      "ms": 144.6,
+      "ms": 103.8,
       "truth": [
         40,
         47,
@@ -749,7 +690,7 @@
       "id": "geometric/guitar-open-A",
       "timbre": "geometric",
       "voicing": "guitar-open-A",
-      "ms": 130.2,
+      "ms": 99,
       "truth": [
         45,
         52,
@@ -784,7 +725,7 @@
       "id": "geometric/guitar-open-G",
       "timbre": "geometric",
       "voicing": "guitar-open-G",
-      "ms": 137.7,
+      "ms": 98.3,
       "truth": [
         43,
         47,
@@ -798,9 +739,7 @@
         47,
         50,
         55,
-        59,
-        83,
-        91
+        59
       ],
       "hits": [
         43,
@@ -809,14 +748,11 @@
         55,
         59
       ],
-      "ghosts": [
-        83,
-        91
-      ],
+      "ghosts": [],
       "misses": [
         67
       ],
-      "oct": 2,
+      "oct": 0,
       "fifth": 0,
       "oth": 0
     },
@@ -824,7 +760,7 @@
       "id": "geometric/guitar-barre-F",
       "timbre": "geometric",
       "voicing": "guitar-barre-F",
-      "ms": 162,
+      "ms": 99.3,
       "truth": [
         41,
         48,
@@ -840,7 +776,6 @@
         57,
         65,
         67,
-        77,
         84
       ],
       "hits": [
@@ -852,13 +787,12 @@
       ],
       "ghosts": [
         67,
-        77,
         84
       ],
       "misses": [
         60
       ],
-      "oct": 2,
+      "oct": 1,
       "fifth": 1,
       "oth": 0
     },
@@ -866,7 +800,7 @@
       "id": "geometric/quartal-stack",
       "timbre": "geometric",
       "voicing": "quartal-stack",
-      "ms": 130.1,
+      "ms": 97.3,
       "truth": [
         45,
         50,
@@ -901,21 +835,17 @@
       "id": "bright/triad-close-Cmaj",
       "timbre": "bright",
       "voicing": "triad-close-Cmaj",
-      "ms": 205.8,
+      "ms": 101.6,
       "truth": [
         60,
         64,
         67
       ],
       "detected": [
-        24,
-        30,
-        36,
         60,
         64,
         67,
         86,
-        88,
         95
       ],
       "hits": [
@@ -924,23 +854,19 @@
         67
       ],
       "ghosts": [
-        24,
-        30,
-        36,
         86,
-        88,
         95
       ],
       "misses": [],
-      "oct": 3,
+      "oct": 0,
       "fifth": 2,
-      "oth": 1
+      "oth": 0
     },
     {
       "id": "bright/triad-open-Cmaj",
       "timbre": "bright",
       "voicing": "triad-open-Cmaj",
-      "ms": 132,
+      "ms": 101.5,
       "truth": [
         48,
         55,
@@ -948,8 +874,6 @@
         72
       ],
       "detected": [
-        26,
-        27,
         48,
         55,
         64,
@@ -961,20 +885,17 @@
         64,
         72
       ],
-      "ghosts": [
-        26,
-        27
-      ],
+      "ghosts": [],
       "misses": [],
       "oct": 0,
-      "fifth": 1,
-      "oth": 1
+      "fifth": 0,
+      "oth": 0
     },
     {
       "id": "bright/min7-A-close",
       "timbre": "bright",
       "voicing": "min7-A-close",
-      "ms": 141.3,
+      "ms": 102.4,
       "truth": [
         57,
         60,
@@ -982,15 +903,11 @@
         67
       ],
       "detected": [
-        24,
-        39,
-        40,
         57,
         60,
         64,
         67,
         83,
-        86,
         88
       ],
       "hits": [
@@ -1000,23 +917,19 @@
         67
       ],
       "ghosts": [
-        24,
-        39,
-        40,
         83,
-        86,
         88
       ],
       "misses": [],
-      "oct": 3,
-      "fifth": 2,
-      "oth": 1
+      "oct": 1,
+      "fifth": 1,
+      "oth": 0
     },
     {
       "id": "bright/dim7-Fs",
       "timbre": "bright",
       "voicing": "dim7-Fs",
-      "ms": 133.9,
+      "ms": 98.6,
       "truth": [
         54,
         57,
@@ -1024,10 +937,6 @@
         63
       ],
       "detected": [
-        27,
-        28,
-        30,
-        31,
         54,
         57,
         60,
@@ -1039,22 +948,17 @@
         60,
         63
       ],
-      "ghosts": [
-        27,
-        28,
-        30,
-        31
-      ],
+      "ghosts": [],
       "misses": [],
-      "oct": 2,
-      "fifth": 2,
+      "oct": 0,
+      "fifth": 0,
       "oth": 0
     },
     {
       "id": "bright/dom7-G-low",
       "timbre": "bright",
       "voicing": "dom7-G-low",
-      "ms": 145.5,
+      "ms": 98.2,
       "truth": [
         43,
         47,
@@ -1067,9 +971,7 @@
         50,
         53,
         78,
-        81,
-        99,
-        101
+        81
       ],
       "hits": [
         43,
@@ -1079,20 +981,18 @@
       ],
       "ghosts": [
         78,
-        81,
-        99,
-        101
+        81
       ],
       "misses": [],
-      "oct": 1,
+      "oct": 0,
       "fifth": 2,
-      "oth": 1
+      "oth": 0
     },
     {
       "id": "bright/maj7-C-open",
       "timbre": "bright",
       "voicing": "maj7-C-open",
-      "ms": 134.9,
+      "ms": 104.6,
       "truth": [
         48,
         55,
@@ -1100,9 +1000,6 @@
         64
       ],
       "detected": [
-        22,
-        23,
-        25,
         48,
         55,
         59,
@@ -1117,22 +1014,19 @@
         64
       ],
       "ghosts": [
-        22,
-        23,
-        25,
         74,
         83
       ],
       "misses": [],
-      "oct": 2,
+      "oct": 1,
       "fifth": 1,
-      "oth": 2
+      "oth": 0
     },
     {
       "id": "bright/min7-D-close",
       "timbre": "bright",
       "voicing": "min7-D-close",
-      "ms": 120,
+      "ms": 99,
       "truth": [
         50,
         53,
@@ -1140,9 +1034,6 @@
         60
       ],
       "detected": [
-        22,
-        30,
-        31,
         50,
         53,
         57,
@@ -1156,21 +1047,18 @@
         60
       ],
       "ghosts": [
-        22,
-        30,
-        31,
         88
       ],
       "misses": [],
       "oct": 0,
-      "fifth": 3,
-      "oth": 1
+      "fifth": 1,
+      "oth": 0
     },
     {
       "id": "bright/dom9-F",
       "timbre": "bright",
       "voicing": "dom9-F",
-      "ms": 198.4,
+      "ms": 98.5,
       "truth": [
         41,
         45,
@@ -1184,8 +1072,7 @@
         48,
         51,
         55,
-        79,
-        102
+        79
       ],
       "hits": [
         41,
@@ -1195,19 +1082,18 @@
         55
       ],
       "ghosts": [
-        79,
-        102
+        79
       ],
       "misses": [],
       "oct": 1,
       "fifth": 0,
-      "oth": 1
+      "oth": 0
     },
     {
       "id": "bright/dom13-Bb",
       "timbre": "bright",
       "voicing": "dom13-Bb",
-      "ms": 125.7,
+      "ms": 101.6,
       "truth": [
         46,
         50,
@@ -1217,9 +1103,6 @@
         68
       ],
       "detected": [
-        22,
-        23,
-        24,
         46,
         50,
         56,
@@ -1236,24 +1119,21 @@
         65
       ],
       "ghosts": [
-        22,
-        23,
-        24,
         80,
         84
       ],
       "misses": [
         68
       ],
-      "oct": 4,
+      "oct": 2,
       "fifth": 0,
-      "oth": 1
+      "oth": 0
     },
     {
       "id": "bright/min11-E-wide",
       "timbre": "bright",
       "voicing": "min11-E-wide",
-      "ms": 121,
+      "ms": 99.2,
       "truth": [
         40,
         47,
@@ -1299,7 +1179,7 @@
       "id": "bright/oct-quad-C",
       "timbre": "bright",
       "voicing": "oct-quad-C",
-      "ms": 204.1,
+      "ms": 98.4,
       "truth": [
         36,
         48,
@@ -1312,10 +1192,7 @@
         72,
         74,
         79,
-        86,
-        88,
-        91,
-        96
+        91
       ],
       "hits": [
         36,
@@ -1325,23 +1202,20 @@
       "ghosts": [
         74,
         79,
-        86,
-        88,
-        91,
-        96
+        91
       ],
       "misses": [
         60
       ],
-      "oct": 1,
+      "oct": 0,
       "fifth": 2,
-      "oth": 3
+      "oth": 1
     },
     {
       "id": "bright/oct-triple-E",
       "timbre": "bright",
       "voicing": "oct-triple-E",
-      "ms": 137.5,
+      "ms": 98,
       "truth": [
         40,
         52,
@@ -1352,8 +1226,7 @@
         40,
         52,
         76,
-        78,
-        83
+        78
       ],
       "hits": [
         40,
@@ -1361,14 +1234,13 @@
       ],
       "ghosts": [
         76,
-        78,
-        83
+        78
       ],
       "misses": [
         59,
         64
       ],
-      "oct": 2,
+      "oct": 1,
       "fifth": 1,
       "oth": 0
     },
@@ -1376,89 +1248,62 @@
       "id": "bright/cluster-semitone",
       "timbre": "bright",
       "voicing": "cluster-semitone",
-      "ms": 153.2,
+      "ms": 96.9,
       "truth": [
         60,
         61,
         62
       ],
       "detected": [
-        22,
-        23,
-        30,
-        36,
-        37,
         61,
-        62,
-        97,
-        98,
-        99,
-        100
+        62
       ],
       "hits": [
         61,
         62
       ],
-      "ghosts": [
-        22,
-        23,
-        30,
-        36,
-        37,
-        97,
-        98,
-        99,
-        100
-      ],
+      "ghosts": [],
       "misses": [
         60
       ],
-      "oct": 4,
-      "fifth": 1,
-      "oth": 4
+      "oct": 0,
+      "fifth": 0,
+      "oth": 0
     },
     {
       "id": "bright/cluster-C-Cs-G",
       "timbre": "bright",
       "voicing": "cluster-C-Cs-G",
-      "ms": 139.8,
+      "ms": 99.4,
       "truth": [
         60,
         61,
         67
       ],
       "detected": [
-        31,
-        32,
-        33,
-        35,
-        60,
         61,
         67,
         86
       ],
       "hits": [
-        60,
         61,
         67
       ],
       "ghosts": [
-        31,
-        32,
-        33,
-        35,
         86
       ],
-      "misses": [],
-      "oct": 1,
-      "fifth": 2,
-      "oth": 2
+      "misses": [
+        60
+      ],
+      "oct": 0,
+      "fifth": 1,
+      "oth": 0
     },
     {
       "id": "bright/maj9-wide-spread",
       "timbre": "bright",
       "voicing": "maj9-wide-spread",
-      "ms": 133.8,
+      "ms": 109.7,
       "truth": [
         36,
         55,
@@ -1473,11 +1318,7 @@
         64,
         71,
         74,
-        79,
-        93,
-        98,
-        102,
-        103
+        79
       ],
       "hits": [
         36,
@@ -1487,22 +1328,17 @@
         74,
         79
       ],
-      "ghosts": [
-        93,
-        98,
-        102,
-        103
-      ],
+      "ghosts": [],
       "misses": [],
-      "oct": 2,
-      "fifth": 2,
+      "oct": 0,
+      "fifth": 0,
       "oth": 0
     },
     {
       "id": "bright/low-bass-E1",
       "timbre": "bright",
       "voicing": "low-bass-E1",
-      "ms": 142,
+      "ms": 99.2,
       "truth": [
         28,
         35,
@@ -1516,10 +1352,7 @@
         54,
         59,
         66,
-        85,
-        95,
-        96,
-        98
+        85
       ],
       "hits": [
         28,
@@ -1530,23 +1363,20 @@
         54,
         59,
         66,
-        85,
-        95,
-        96,
-        98
+        85
       ],
       "misses": [
         47
       ],
-      "oct": 2,
+      "oct": 1,
       "fifth": 2,
-      "oth": 3
+      "oth": 1
     },
     {
       "id": "bright/low-bass-C1",
       "timbre": "bright",
       "voicing": "low-bass-C1",
-      "ms": 149.5,
+      "ms": 107.2,
       "truth": [
         24,
         31,
@@ -1584,7 +1414,7 @@
       "id": "bright/guitar-open-E",
       "timbre": "bright",
       "voicing": "guitar-open-E",
-      "ms": 130.3,
+      "ms": 101,
       "truth": [
         40,
         47,
@@ -1601,10 +1431,7 @@
         68,
         71,
         75,
-        80,
-        83,
-        88,
-        92
+        83
       ],
       "hits": [
         40,
@@ -1616,17 +1443,14 @@
         68,
         71,
         75,
-        80,
-        83,
-        88,
-        92
+        83
       ],
       "misses": [
         56,
         59,
         64
       ],
-      "oct": 6,
+      "oct": 3,
       "fifth": 2,
       "oth": 0
     },
@@ -1634,7 +1458,7 @@
       "id": "bright/guitar-open-A",
       "timbre": "bright",
       "voicing": "guitar-open-A",
-      "ms": 125.1,
+      "ms": 102.1,
       "truth": [
         45,
         52,
@@ -1649,7 +1473,6 @@
         64,
         69,
         76,
-        92,
         95
       ],
       "hits": [
@@ -1661,21 +1484,20 @@
       "ghosts": [
         69,
         76,
-        92,
         95
       ],
       "misses": [
         57
       ],
       "oct": 2,
-      "fifth": 2,
+      "fifth": 1,
       "oth": 0
     },
     {
       "id": "bright/guitar-open-G",
       "timbre": "bright",
       "voicing": "guitar-open-G",
-      "ms": 155.1,
+      "ms": 104.9,
       "truth": [
         43,
         47,
@@ -1720,7 +1542,7 @@
       "id": "bright/guitar-barre-F",
       "timbre": "bright",
       "voicing": "guitar-barre-F",
-      "ms": 160.9,
+      "ms": 109.4,
       "truth": [
         41,
         48,
@@ -1763,7 +1585,7 @@
       "id": "bright/quartal-stack",
       "timbre": "bright",
       "voicing": "quartal-stack",
-      "ms": 158,
+      "ms": 103.9,
       "truth": [
         45,
         50,
@@ -1779,9 +1601,7 @@
         60,
         65,
         70,
-        74,
-        84,
-        101
+        74
       ],
       "hits": [
         45,
@@ -1792,12 +1612,10 @@
         70
       ],
       "ghosts": [
-        74,
-        84,
-        101
+        74
       ],
       "misses": [],
-      "oct": 3,
+      "oct": 1,
       "fifth": 0,
       "oth": 0
     },
@@ -1805,46 +1623,33 @@
       "id": "dark/triad-close-Cmaj",
       "timbre": "dark",
       "voicing": "triad-close-Cmaj",
-      "ms": 130.8,
+      "ms": 104.9,
       "truth": [
         60,
         64,
         67
       ],
       "detected": [
-        21,
-        25,
-        26,
-        27,
-        43,
         60,
         64,
-        67,
-        108
+        67
       ],
       "hits": [
         60,
         64,
         67
       ],
-      "ghosts": [
-        21,
-        25,
-        26,
-        27,
-        43,
-        108
-      ],
+      "ghosts": [],
       "misses": [],
-      "oct": 2,
-      "fifth": 2,
-      "oth": 2
+      "oct": 0,
+      "fifth": 0,
+      "oth": 0
     },
     {
       "id": "dark/triad-open-Cmaj",
       "timbre": "dark",
       "voicing": "triad-open-Cmaj",
-      "ms": 127.9,
+      "ms": 101.2,
       "truth": [
         48,
         55,
@@ -1852,8 +1657,6 @@
         72
       ],
       "detected": [
-        22,
-        23,
         48,
         55,
         64,
@@ -1865,20 +1668,17 @@
         64,
         72
       ],
-      "ghosts": [
-        22,
-        23
-      ],
+      "ghosts": [],
       "misses": [],
       "oct": 0,
-      "fifth": 1,
-      "oth": 1
+      "fifth": 0,
+      "oth": 0
     },
     {
       "id": "dark/min7-A-close",
       "timbre": "dark",
       "voicing": "min7-A-close",
-      "ms": 140.6,
+      "ms": 98.3,
       "truth": [
         57,
         60,
@@ -1886,9 +1686,6 @@
         67
       ],
       "detected": [
-        24,
-        29,
-        33,
         57,
         60,
         64,
@@ -1900,21 +1697,17 @@
         64,
         67
       ],
-      "ghosts": [
-        24,
-        29,
-        33
-      ],
+      "ghosts": [],
       "misses": [],
-      "oct": 2,
-      "fifth": 1,
+      "oct": 0,
+      "fifth": 0,
       "oth": 0
     },
     {
       "id": "dark/dim7-Fs",
       "timbre": "dark",
       "voicing": "dim7-Fs",
-      "ms": 150.6,
+      "ms": 102.2,
       "truth": [
         54,
         57,
@@ -1922,16 +1715,10 @@
         63
       ],
       "detected": [
-        30,
-        31,
-        32,
-        34,
-        35,
         54,
         57,
         60,
-        63,
-        106
+        63
       ],
       "hits": [
         54,
@@ -1939,24 +1726,17 @@
         60,
         63
       ],
-      "ghosts": [
-        30,
-        31,
-        32,
-        34,
-        35,
-        106
-      ],
+      "ghosts": [],
       "misses": [],
-      "oct": 1,
-      "fifth": 5,
+      "oct": 0,
+      "fifth": 0,
       "oth": 0
     },
     {
       "id": "dark/dom7-G-low",
       "timbre": "dark",
       "voicing": "dom7-G-low",
-      "ms": 154,
+      "ms": 105.6,
       "truth": [
         43,
         47,
@@ -1967,12 +1747,7 @@
         43,
         47,
         50,
-        53,
-        95,
-        100,
-        101,
-        105,
-        106
+        53
       ],
       "hits": [
         43,
@@ -1980,23 +1755,17 @@
         50,
         53
       ],
-      "ghosts": [
-        95,
-        100,
-        101,
-        105,
-        106
-      ],
+      "ghosts": [],
       "misses": [],
-      "oct": 2,
-      "fifth": 3,
+      "oct": 0,
+      "fifth": 0,
       "oth": 0
     },
     {
       "id": "dark/maj7-C-open",
       "timbre": "dark",
       "voicing": "maj7-C-open",
-      "ms": 158.4,
+      "ms": 100,
       "truth": [
         48,
         55,
@@ -2004,13 +1773,10 @@
         64
       ],
       "detected": [
-        25,
         48,
         55,
         59,
-        64,
-        106,
-        108
+        64
       ],
       "hits": [
         48,
@@ -2018,21 +1784,17 @@
         59,
         64
       ],
-      "ghosts": [
-        25,
-        106,
-        108
-      ],
+      "ghosts": [],
       "misses": [],
-      "oct": 1,
+      "oct": 0,
       "fifth": 0,
-      "oth": 2
+      "oth": 0
     },
     {
       "id": "dark/min7-D-close",
       "timbre": "dark",
       "voicing": "min7-D-close",
-      "ms": 152.8,
+      "ms": 98.7,
       "truth": [
         50,
         53,
@@ -2040,14 +1802,10 @@
         60
       ],
       "detected": [
-        22,
-        24,
-        25,
         50,
         53,
         57,
-        60,
-        108
+        60
       ],
       "hits": [
         50,
@@ -2055,22 +1813,17 @@
         57,
         60
       ],
-      "ghosts": [
-        22,
-        24,
-        25,
-        108
-      ],
+      "ghosts": [],
       "misses": [],
-      "oct": 2,
-      "fifth": 1,
-      "oth": 1
+      "oct": 0,
+      "fifth": 0,
+      "oth": 0
     },
     {
       "id": "dark/dom9-F",
       "timbre": "dark",
       "voicing": "dom9-F",
-      "ms": 131.7,
+      "ms": 99.1,
       "truth": [
         41,
         45,
@@ -2083,11 +1836,7 @@
         45,
         48,
         51,
-        55,
-        97,
-        101,
-        102,
-        107
+        55
       ],
       "hits": [
         41,
@@ -2096,22 +1845,17 @@
         51,
         55
       ],
-      "ghosts": [
-        97,
-        101,
-        102,
-        107
-      ],
+      "ghosts": [],
       "misses": [],
-      "oct": 1,
+      "oct": 0,
       "fifth": 0,
-      "oth": 3
+      "oth": 0
     },
     {
       "id": "dark/dom13-Bb",
       "timbre": "dark",
       "voicing": "dom13-Bb",
-      "ms": 139.2,
+      "ms": 99.4,
       "truth": [
         46,
         50,
@@ -2146,7 +1890,7 @@
       "id": "dark/min11-E-wide",
       "timbre": "dark",
       "voicing": "min11-E-wide",
-      "ms": 136.5,
+      "ms": 98.1,
       "truth": [
         40,
         47,
@@ -2160,8 +1904,7 @@
         47,
         50,
         55,
-        64,
-        105
+        64
       ],
       "hits": [
         40,
@@ -2170,21 +1913,19 @@
         55,
         64
       ],
-      "ghosts": [
-        105
-      ],
+      "ghosts": [],
       "misses": [
         59
       ],
       "oct": 0,
-      "fifth": 1,
+      "fifth": 0,
       "oth": 0
     },
     {
       "id": "dark/oct-quad-C",
       "timbre": "dark",
       "voicing": "oct-quad-C",
-      "ms": 134.7,
+      "ms": 98.6,
       "truth": [
         36,
         48,
@@ -2194,29 +1935,26 @@
       "detected": [
         36,
         48,
-        60,
-        91
+        60
       ],
       "hits": [
         36,
         48,
         60
       ],
-      "ghosts": [
-        91
-      ],
+      "ghosts": [],
       "misses": [
         72
       ],
       "oct": 0,
-      "fifth": 1,
+      "fifth": 0,
       "oth": 0
     },
     {
       "id": "dark/oct-triple-E",
       "timbre": "dark",
       "voicing": "oct-triple-E",
-      "ms": 138.3,
+      "ms": 99.9,
       "truth": [
         40,
         52,
@@ -2226,21 +1964,18 @@
       "detected": [
         40,
         59,
-        64,
-        107
+        64
       ],
       "hits": [
         40,
         59,
         64
       ],
-      "ghosts": [
-        107
-      ],
+      "ghosts": [],
       "misses": [
         52
       ],
-      "oct": 1,
+      "oct": 0,
       "fifth": 0,
       "oth": 0
     },
@@ -2248,57 +1983,39 @@
       "id": "dark/cluster-semitone",
       "timbre": "dark",
       "voicing": "cluster-semitone",
-      "ms": 121.4,
+      "ms": 98.9,
       "truth": [
         60,
         61,
         62
       ],
       "detected": [
-        25,
-        26,
-        27,
-        28,
-        36,
-        37,
         60,
         61,
-        62,
-        105
+        62
       ],
       "hits": [
         60,
         61,
         62
       ],
-      "ghosts": [
-        25,
-        26,
-        27,
-        28,
-        36,
-        37,
-        105
-      ],
+      "ghosts": [],
       "misses": [],
-      "oct": 4,
-      "fifth": 1,
-      "oth": 2
+      "oct": 0,
+      "fifth": 0,
+      "oth": 0
     },
     {
       "id": "dark/cluster-C-Cs-G",
       "timbre": "dark",
       "voicing": "cluster-C-Cs-G",
-      "ms": 142.4,
+      "ms": 100.1,
       "truth": [
         60,
         61,
         67
       ],
       "detected": [
-        22,
-        28,
-        31,
         60,
         61,
         67
@@ -2308,21 +2025,17 @@
         61,
         67
       ],
-      "ghosts": [
-        22,
-        28,
-        31
-      ],
+      "ghosts": [],
       "misses": [],
-      "oct": 1,
+      "oct": 0,
       "fifth": 0,
-      "oth": 2
+      "oth": 0
     },
     {
       "id": "dark/maj9-wide-spread",
       "timbre": "dark",
       "voicing": "maj9-wide-spread",
-      "ms": 120.7,
+      "ms": 98.4,
       "truth": [
         36,
         55,
@@ -2357,7 +2070,7 @@
       "id": "dark/low-bass-E1",
       "timbre": "dark",
       "voicing": "low-bass-E1",
-      "ms": 143.6,
+      "ms": 100.2,
       "truth": [
         28,
         35,
@@ -2368,36 +2081,30 @@
         28,
         35,
         40,
-        47,
         59,
-        89,
-        91,
-        95,
-        99
+        66
       ],
       "hits": [
         28,
         35,
-        40,
-        47
+        40
       ],
       "ghosts": [
         59,
-        89,
-        91,
-        95,
-        99
+        66
       ],
-      "misses": [],
-      "oct": 2,
-      "fifth": 0,
-      "oth": 3
+      "misses": [
+        47
+      ],
+      "oct": 1,
+      "fifth": 1,
+      "oth": 0
     },
     {
       "id": "dark/low-bass-C1",
       "timbre": "dark",
       "voicing": "low-bass-C1",
-      "ms": 148.8,
+      "ms": 103.6,
       "truth": [
         24,
         31,
@@ -2407,41 +2114,26 @@
       "detected": [
         24,
         31,
-        43,
-        85,
-        87,
-        91,
-        97,
-        100,
-        102,
-        105
+        43
       ],
       "hits": [
         24,
         31,
         43
       ],
-      "ghosts": [
-        85,
-        87,
-        91,
-        97,
-        100,
-        102,
-        105
-      ],
+      "ghosts": [],
       "misses": [
         36
       ],
-      "oct": 1,
+      "oct": 0,
       "fifth": 0,
-      "oth": 6
+      "oth": 0
     },
     {
       "id": "dark/guitar-open-E",
       "timbre": "dark",
       "voicing": "guitar-open-E",
-      "ms": 124.9,
+      "ms": 101.5,
       "truth": [
         40,
         47,
@@ -2455,9 +2147,7 @@
         47,
         52,
         56,
-        64,
-        78,
-        108
+        64
       ],
       "hits": [
         40,
@@ -2466,22 +2156,19 @@
         56,
         64
       ],
-      "ghosts": [
-        78,
-        108
-      ],
+      "ghosts": [],
       "misses": [
         59
       ],
       "oct": 0,
-      "fifth": 1,
-      "oth": 1
+      "fifth": 0,
+      "oth": 0
     },
     {
       "id": "dark/guitar-open-A",
       "timbre": "dark",
       "voicing": "guitar-open-A",
-      "ms": 138.1,
+      "ms": 102.4,
       "truth": [
         45,
         52,
@@ -2513,7 +2200,7 @@
       "id": "dark/guitar-open-G",
       "timbre": "dark",
       "voicing": "guitar-open-G",
-      "ms": 145.6,
+      "ms": 104.5,
       "truth": [
         43,
         47,
@@ -2527,8 +2214,7 @@
         47,
         50,
         59,
-        67,
-        108
+        67
       ],
       "hits": [
         43,
@@ -2537,21 +2223,19 @@
         59,
         67
       ],
-      "ghosts": [
-        108
-      ],
+      "ghosts": [],
       "misses": [
         55
       ],
       "oct": 0,
-      "fifth": 1,
+      "fifth": 0,
       "oth": 0
     },
     {
       "id": "dark/guitar-barre-F",
       "timbre": "dark",
       "voicing": "guitar-barre-F",
-      "ms": 149.7,
+      "ms": 98.6,
       "truth": [
         41,
         48,
@@ -2585,7 +2269,7 @@
       "id": "dark/quartal-stack",
       "timbre": "dark",
       "voicing": "quartal-stack",
-      "ms": 133,
+      "ms": 98,
       "truth": [
         45,
         50,
@@ -2620,19 +2304,13 @@
       "id": "hollow/triad-close-Cmaj",
       "timbre": "hollow",
       "voicing": "triad-close-Cmaj",
-      "ms": 137.4,
+      "ms": 98.7,
       "truth": [
         60,
         64,
         67
       ],
       "detected": [
-        24,
-        25,
-        26,
-        38,
-        39,
-        41,
         60,
         64,
         67,
@@ -2645,25 +2323,19 @@
         67
       ],
       "ghosts": [
-        24,
-        25,
-        26,
-        38,
-        39,
-        41,
         83,
         86
       ],
       "misses": [],
-      "oct": 1,
-      "fifth": 5,
-      "oth": 2
+      "oct": 0,
+      "fifth": 2,
+      "oth": 0
     },
     {
       "id": "hollow/triad-open-Cmaj",
       "timbre": "hollow",
       "voicing": "triad-open-Cmaj",
-      "ms": 138.7,
+      "ms": 97.4,
       "truth": [
         48,
         55,
@@ -2671,14 +2343,11 @@
         72
       ],
       "detected": [
-        25,
         48,
         55,
         64,
         72,
-        83,
-        91,
-        100
+        91
       ],
       "hits": [
         48,
@@ -2687,21 +2356,18 @@
         72
       ],
       "ghosts": [
-        25,
-        83,
-        91,
-        100
+        91
       ],
       "misses": [],
-      "oct": 2,
-      "fifth": 1,
-      "oth": 1
+      "oct": 1,
+      "fifth": 0,
+      "oth": 0
     },
     {
       "id": "hollow/min7-A-close",
       "timbre": "hollow",
       "voicing": "min7-A-close",
-      "ms": 156.3,
+      "ms": 98.8,
       "truth": [
         57,
         60,
@@ -2709,10 +2375,6 @@
         67
       ],
       "detected": [
-        23,
-        24,
-        30,
-        36,
         57,
         60,
         64,
@@ -2727,23 +2389,19 @@
         67
       ],
       "ghosts": [
-        23,
-        24,
-        30,
-        36,
         83,
         86
       ],
       "misses": [],
-      "oct": 2,
-      "fifth": 3,
-      "oth": 1
+      "oct": 0,
+      "fifth": 2,
+      "oth": 0
     },
     {
       "id": "hollow/dim7-Fs",
       "timbre": "hollow",
       "voicing": "dim7-Fs",
-      "ms": 142.8,
+      "ms": 98.2,
       "truth": [
         54,
         57,
@@ -2751,15 +2409,10 @@
         63
       ],
       "detected": [
-        29,
-        30,
-        32,
-        33,
         54,
         57,
         60,
         63,
-        73,
         76,
         79,
         82
@@ -2771,25 +2424,20 @@
         63
       ],
       "ghosts": [
-        29,
-        30,
-        32,
-        33,
-        73,
         76,
         79,
         82
       ],
       "misses": [],
-      "oct": 2,
-      "fifth": 6,
+      "oct": 0,
+      "fifth": 3,
       "oth": 0
     },
     {
       "id": "hollow/dom7-G-low",
       "timbre": "hollow",
       "voicing": "dom7-G-low",
-      "ms": 146.9,
+      "ms": 98.2,
       "truth": [
         43,
         47,
@@ -2825,7 +2473,7 @@
       "id": "hollow/maj7-C-open",
       "timbre": "hollow",
       "voicing": "maj7-C-open",
-      "ms": 145.8,
+      "ms": 109.1,
       "truth": [
         48,
         55,
@@ -2833,14 +2481,10 @@
         64
       ],
       "detected": [
-        21,
-        22,
         48,
         55,
         59,
         64,
-        74,
-        78,
         83
       ],
       "hits": [
@@ -2850,22 +2494,18 @@
         64
       ],
       "ghosts": [
-        21,
-        22,
-        74,
-        78,
         83
       ],
       "misses": [],
       "oct": 1,
-      "fifth": 3,
-      "oth": 1
+      "fifth": 0,
+      "oth": 0
     },
     {
       "id": "hollow/min7-D-close",
       "timbre": "hollow",
       "voicing": "min7-D-close",
-      "ms": 142.5,
+      "ms": 103.4,
       "truth": [
         50,
         53,
@@ -2873,9 +2513,6 @@
         60
       ],
       "detected": [
-        21,
-        22,
-        25,
         50,
         53,
         57,
@@ -2890,22 +2527,19 @@
         60
       ],
       "ghosts": [
-        21,
-        22,
-        25,
         76,
         79
       ],
       "misses": [],
-      "oct": 1,
-      "fifth": 3,
-      "oth": 1
+      "oct": 0,
+      "fifth": 2,
+      "oth": 0
     },
     {
       "id": "hollow/dom9-F",
       "timbre": "hollow",
       "voicing": "dom9-F",
-      "ms": 156.3,
+      "ms": 98.5,
       "truth": [
         41,
         45,
@@ -2921,7 +2555,7 @@
         55,
         64,
         70,
-        102
+        74
       ],
       "hits": [
         41,
@@ -2933,18 +2567,18 @@
       "ghosts": [
         64,
         70,
-        102
+        74
       ],
       "misses": [],
       "oct": 0,
-      "fifth": 2,
-      "oth": 1
+      "fifth": 3,
+      "oth": 0
     },
     {
       "id": "hollow/dom13-Bb",
       "timbre": "hollow",
       "voicing": "dom13-Bb",
-      "ms": 141.4,
+      "ms": 99.3,
       "truth": [
         46,
         50,
@@ -2954,33 +2588,29 @@
         68
       ],
       "detected": [
-        22,
         46,
         50,
         56,
         60,
         65,
-        68,
         84,
-        87,
-        106
+        87
       ],
       "hits": [
         46,
         50,
         56,
         60,
-        65,
-        68
+        65
       ],
       "ghosts": [
-        22,
         84,
-        87,
-        106
+        87
       ],
-      "misses": [],
-      "oct": 3,
+      "misses": [
+        68
+      ],
+      "oct": 1,
       "fifth": 1,
       "oth": 0
     },
@@ -2988,7 +2618,7 @@
       "id": "hollow/min11-E-wide",
       "timbre": "hollow",
       "voicing": "min11-E-wide",
-      "ms": 125.8,
+      "ms": 118.2,
       "truth": [
         40,
         47,
@@ -3003,7 +2633,6 @@
         50,
         55,
         64,
-        74,
         78,
         83
       ],
@@ -3015,14 +2644,13 @@
         64
       ],
       "ghosts": [
-        74,
         78,
         83
       ],
       "misses": [
         59
       ],
-      "oct": 2,
+      "oct": 1,
       "fifth": 1,
       "oth": 0
     },
@@ -3030,7 +2658,7 @@
       "id": "hollow/oct-quad-C",
       "timbre": "hollow",
       "voicing": "oct-quad-C",
-      "ms": 163.4,
+      "ms": 104.6,
       "truth": [
         36,
         48,
@@ -3061,7 +2689,7 @@
       "id": "hollow/oct-triple-E",
       "timbre": "hollow",
       "voicing": "oct-triple-E",
-      "ms": 123.1,
+      "ms": 103.3,
       "truth": [
         40,
         52,
@@ -3092,17 +2720,13 @@
       "id": "hollow/cluster-semitone",
       "timbre": "hollow",
       "voicing": "cluster-semitone",
-      "ms": 131.6,
+      "ms": 103.8,
       "truth": [
         60,
         61,
         62
       ],
       "detected": [
-        26,
-        27,
-        30,
-        42,
         60,
         61,
         62,
@@ -3115,40 +2739,30 @@
         62
       ],
       "ghosts": [
-        26,
-        27,
-        30,
-        42,
         79,
         81
       ],
       "misses": [],
-      "oct": 1,
-      "fifth": 4,
-      "oth": 1
+      "oct": 0,
+      "fifth": 2,
+      "oth": 0
     },
     {
       "id": "hollow/cluster-C-Cs-G",
       "timbre": "hollow",
       "voicing": "cluster-C-Cs-G",
-      "ms": 147.8,
+      "ms": 101.1,
       "truth": [
         60,
         61,
         67
       ],
       "detected": [
-        27,
-        28,
-        29,
-        37,
         60,
         61,
         67,
         80,
-        86,
-        95,
-        105
+        86
       ],
       "hits": [
         60,
@@ -3156,25 +2770,19 @@
         67
       ],
       "ghosts": [
-        27,
-        28,
-        29,
-        37,
         80,
-        86,
-        95,
-        105
+        86
       ],
       "misses": [],
-      "oct": 1,
-      "fifth": 3,
-      "oth": 4
+      "oct": 0,
+      "fifth": 2,
+      "oth": 0
     },
     {
       "id": "hollow/maj9-wide-spread",
       "timbre": "hollow",
       "voicing": "maj9-wide-spread",
-      "ms": 154.2,
+      "ms": 104.9,
       "truth": [
         36,
         55,
@@ -3190,8 +2798,7 @@
         71,
         74,
         79,
-        93,
-        98
+        93
       ],
       "hits": [
         36,
@@ -3202,11 +2809,10 @@
         79
       ],
       "ghosts": [
-        93,
-        98
+        93
       ],
       "misses": [],
-      "oct": 1,
+      "oct": 0,
       "fifth": 1,
       "oth": 0
     },
@@ -3214,7 +2820,7 @@
       "id": "hollow/low-bass-E1",
       "timbre": "hollow",
       "voicing": "low-bass-E1",
-      "ms": 146,
+      "ms": 100.2,
       "truth": [
         28,
         35,
@@ -3230,9 +2836,7 @@
         56,
         63,
         66,
-        68,
-        94,
-        107
+        68
       ],
       "hits": [
         28,
@@ -3245,20 +2849,18 @@
         56,
         63,
         66,
-        68,
-        94,
-        107
+        68
       ],
       "misses": [],
-      "oct": 1,
+      "oct": 0,
       "fifth": 2,
-      "oth": 4
+      "oth": 3
     },
     {
       "id": "hollow/low-bass-C1",
       "timbre": "hollow",
       "voicing": "low-bass-C1",
-      "ms": 137.7,
+      "ms": 99,
       "truth": [
         24,
         31,
@@ -3294,7 +2896,7 @@
       "id": "hollow/guitar-open-E",
       "timbre": "hollow",
       "voicing": "guitar-open-E",
-      "ms": 132.7,
+      "ms": 98.8,
       "truth": [
         40,
         47,
@@ -3334,7 +2936,7 @@
       "id": "hollow/guitar-open-A",
       "timbre": "hollow",
       "voicing": "guitar-open-A",
-      "ms": 132.3,
+      "ms": 105.3,
       "truth": [
         45,
         52,
@@ -3346,7 +2948,6 @@
         45,
         52,
         61,
-        71,
         80,
         83
       ],
@@ -3356,7 +2957,6 @@
         61
       ],
       "ghosts": [
-        71,
         80,
         83
       ],
@@ -3365,14 +2965,14 @@
         64
       ],
       "oct": 0,
-      "fifth": 3,
+      "fifth": 2,
       "oth": 0
     },
     {
       "id": "hollow/guitar-open-G",
       "timbre": "hollow",
       "voicing": "guitar-open-G",
-      "ms": 124.1,
+      "ms": 100.5,
       "truth": [
         43,
         47,
@@ -3386,9 +2986,7 @@
         47,
         50,
         67,
-        78,
-        95,
-        105
+        78
       ],
       "hits": [
         43,
@@ -3397,23 +2995,21 @@
         67
       ],
       "ghosts": [
-        78,
-        95,
-        105
+        78
       ],
       "misses": [
         55,
         59
       ],
-      "oct": 1,
-      "fifth": 2,
+      "oct": 0,
+      "fifth": 1,
       "oth": 0
     },
     {
       "id": "hollow/guitar-barre-F",
       "timbre": "hollow",
       "voicing": "guitar-barre-F",
-      "ms": 146.6,
+      "ms": 100.3,
       "truth": [
         41,
         48,
@@ -3429,8 +3025,7 @@
         60,
         65,
         76,
-        79,
-        93
+        79
       ],
       "hits": [
         41,
@@ -3441,13 +3036,12 @@
       ],
       "ghosts": [
         76,
-        79,
-        93
+        79
       ],
       "misses": [
         53
       ],
-      "oct": 1,
+      "oct": 0,
       "fifth": 2,
       "oth": 0
     },
@@ -3455,7 +3049,7 @@
       "id": "hollow/quartal-stack",
       "timbre": "hollow",
       "voicing": "quartal-stack",
-      "ms": 157,
+      "ms": 100.4,
       "truth": [
         45,
         50,
@@ -3471,10 +3065,7 @@
         60,
         65,
         70,
-        88,
-        93,
-        98,
-        108
+        88
       ],
       "hits": [
         45,
@@ -3485,13 +3076,10 @@
         70
       ],
       "ghosts": [
-        88,
-        93,
-        98,
-        108
+        88
       ],
       "misses": [],
-      "oct": 3,
+      "oct": 0,
       "fifth": 1,
       "oth": 0
     },
@@ -3499,25 +3087,19 @@
       "id": "formant/triad-close-Cmaj",
       "timbre": "formant",
       "voicing": "triad-close-Cmaj",
-      "ms": 146.2,
+      "ms": 104.2,
       "truth": [
         60,
         64,
         67
       ],
       "detected": [
-        22,
-        25,
-        26,
-        41,
-        44,
         60,
         64,
         67,
         72,
         76,
-        79,
-        83
+        79
       ],
       "hits": [
         60,
@@ -3525,26 +3107,20 @@
         67
       ],
       "ghosts": [
-        22,
-        25,
-        26,
-        41,
-        44,
         72,
         76,
-        79,
-        83
+        79
       ],
       "misses": [],
       "oct": 3,
-      "fifth": 3,
-      "oth": 3
+      "fifth": 0,
+      "oth": 0
     },
     {
       "id": "formant/triad-open-Cmaj",
       "timbre": "formant",
       "voicing": "triad-open-Cmaj",
-      "ms": 148.1,
+      "ms": 102.2,
       "truth": [
         48,
         55,
@@ -3552,9 +3128,6 @@
         72
       ],
       "detected": [
-        22,
-        23,
-        28,
         48,
         55,
         64,
@@ -3569,9 +3142,6 @@
         64
       ],
       "ghosts": [
-        22,
-        23,
-        28,
         74,
         76,
         79,
@@ -3580,15 +3150,15 @@
       "misses": [
         72
       ],
-      "oct": 4,
-      "fifth": 2,
-      "oth": 1
+      "oct": 3,
+      "fifth": 1,
+      "oth": 0
     },
     {
       "id": "formant/min7-A-close",
       "timbre": "formant",
       "voicing": "min7-A-close",
-      "ms": 191.3,
+      "ms": 99.8,
       "truth": [
         57,
         60,
@@ -3596,15 +3166,10 @@
         67
       ],
       "detected": [
-        22,
-        23,
-        24,
-        25,
         57,
         60,
         64,
         67,
-        69,
         72,
         76,
         79
@@ -3616,25 +3181,20 @@
         67
       ],
       "ghosts": [
-        22,
-        23,
-        24,
-        25,
-        69,
         72,
         76,
         79
       ],
       "misses": [],
-      "oct": 5,
-      "fifth": 1,
-      "oth": 2
+      "oct": 3,
+      "fifth": 0,
+      "oth": 0
     },
     {
       "id": "formant/dim7-Fs",
       "timbre": "formant",
       "voicing": "dim7-Fs",
-      "ms": 134,
+      "ms": 100.3,
       "truth": [
         54,
         57,
@@ -3642,9 +3202,6 @@
         63
       ],
       "detected": [
-        28,
-        31,
-        32,
         54,
         57,
         60,
@@ -3662,9 +3219,6 @@
         63
       ],
       "ghosts": [
-        28,
-        31,
-        32,
         69,
         72,
         75,
@@ -3673,14 +3227,14 @@
       ],
       "misses": [],
       "oct": 3,
-      "fifth": 5,
+      "fifth": 2,
       "oth": 0
     },
     {
       "id": "formant/dom7-G-low",
       "timbre": "formant",
       "voicing": "dom7-G-low",
-      "ms": 137.1,
+      "ms": 100.3,
       "truth": [
         43,
         47,
@@ -3692,6 +3246,7 @@
         47,
         50,
         53,
+        59,
         72,
         77,
         78,
@@ -3704,13 +3259,14 @@
         53
       ],
       "ghosts": [
+        59,
         72,
         77,
         78,
         81
       ],
       "misses": [],
-      "oct": 1,
+      "oct": 2,
       "fifth": 3,
       "oth": 0
     },
@@ -3718,7 +3274,7 @@
       "id": "formant/maj7-C-open",
       "timbre": "formant",
       "voicing": "maj7-C-open",
-      "ms": 139.6,
+      "ms": 102.9,
       "truth": [
         48,
         55,
@@ -3726,9 +3282,6 @@
         64
       ],
       "detected": [
-        21,
-        29,
-        32,
         48,
         55,
         59,
@@ -3744,23 +3297,20 @@
         64
       ],
       "ghosts": [
-        21,
-        29,
-        32,
         71,
         74,
         76
       ],
       "misses": [],
       "oct": 2,
-      "fifth": 3,
-      "oth": 1
+      "fifth": 1,
+      "oth": 0
     },
     {
       "id": "formant/min7-D-close",
       "timbre": "formant",
       "voicing": "min7-D-close",
-      "ms": 143,
+      "ms": 98.3,
       "truth": [
         50,
         53,
@@ -3768,10 +3318,6 @@
         60
       ],
       "detected": [
-        21,
-        22,
-        23,
-        24,
         50,
         53,
         57,
@@ -3779,6 +3325,7 @@
         69,
         72,
         76,
+        79,
         81
       ],
       "hits": [
@@ -3788,25 +3335,22 @@
         60
       ],
       "ghosts": [
-        21,
-        22,
-        23,
-        24,
         69,
         72,
         76,
+        79,
         81
       ],
       "misses": [],
-      "oct": 5,
+      "oct": 3,
       "fifth": 2,
-      "oth": 1
+      "oth": 0
     },
     {
       "id": "formant/dom9-F",
       "timbre": "formant",
       "voicing": "dom9-F",
-      "ms": 166.1,
+      "ms": 100.2,
       "truth": [
         41,
         45,
@@ -3820,8 +3364,10 @@
         48,
         51,
         55,
+        60,
         67,
         74,
+        76,
         79
       ],
       "hits": [
@@ -3832,20 +3378,22 @@
         55
       ],
       "ghosts": [
+        60,
         67,
         74,
+        76,
         79
       ],
       "misses": [],
-      "oct": 2,
-      "fifth": 1,
+      "oct": 3,
+      "fifth": 2,
       "oth": 0
     },
     {
       "id": "formant/dom13-Bb",
       "timbre": "formant",
       "voicing": "dom13-Bb",
-      "ms": 159.4,
+      "ms": 111.2,
       "truth": [
         46,
         50,
@@ -3855,10 +3403,6 @@
         68
       ],
       "detected": [
-        21,
-        22,
-        26,
-        27,
         46,
         50,
         56,
@@ -3875,10 +3419,6 @@
         68
       ],
       "ghosts": [
-        21,
-        22,
-        26,
-        27,
         72,
         75,
         77,
@@ -3888,15 +3428,15 @@
         60,
         65
       ],
-      "oct": 5,
-      "fifth": 3,
+      "oct": 3,
+      "fifth": 1,
       "oth": 0
     },
     {
       "id": "formant/min11-E-wide",
       "timbre": "formant",
       "voicing": "min11-E-wide",
-      "ms": 147.3,
+      "ms": 105.7,
       "truth": [
         40,
         47,
@@ -3942,7 +3482,7 @@
       "id": "formant/oct-quad-C",
       "timbre": "formant",
       "voicing": "oct-quad-C",
-      "ms": 161.5,
+      "ms": 101.8,
       "truth": [
         36,
         48,
@@ -3955,7 +3495,6 @@
         67,
         72,
         76,
-        79,
         84
       ],
       "hits": [
@@ -3966,21 +3505,20 @@
       "ghosts": [
         67,
         76,
-        79,
         84
       ],
       "misses": [
         60
       ],
       "oct": 1,
-      "fifth": 2,
+      "fifth": 1,
       "oth": 1
     },
     {
       "id": "formant/oct-triple-E",
       "timbre": "formant",
       "voicing": "oct-triple-E",
-      "ms": 141.6,
+      "ms": 99.3,
       "truth": [
         40,
         52,
@@ -4016,24 +3554,20 @@
       "id": "formant/cluster-semitone",
       "timbre": "formant",
       "voicing": "cluster-semitone",
-      "ms": 144,
+      "ms": 101.3,
       "truth": [
         60,
         61,
         62
       ],
       "detected": [
-        22,
-        23,
-        25,
-        26,
-        44,
-        45,
         60,
         61,
         62,
         73,
         74,
+        79,
+        80,
         81
       ],
       "hits": [
@@ -4042,37 +3576,28 @@
         62
       ],
       "ghosts": [
-        22,
-        23,
-        25,
-        26,
-        44,
-        45,
         73,
         74,
+        79,
+        80,
         81
       ],
       "misses": [],
-      "oct": 4,
+      "oct": 2,
       "fifth": 3,
-      "oth": 2
+      "oth": 0
     },
     {
       "id": "formant/cluster-C-Cs-G",
       "timbre": "formant",
       "voicing": "cluster-C-Cs-G",
-      "ms": 148.6,
+      "ms": 99.9,
       "truth": [
         60,
         61,
         67
       ],
       "detected": [
-        27,
-        28,
-        29,
-        44,
-        45,
         60,
         67,
         72,
@@ -4085,11 +3610,6 @@
         67
       ],
       "ghosts": [
-        27,
-        28,
-        29,
-        44,
-        45,
         72,
         73,
         79,
@@ -4099,14 +3619,14 @@
         61
       ],
       "oct": 3,
-      "fifth": 3,
-      "oth": 3
+      "fifth": 1,
+      "oth": 0
     },
     {
       "id": "formant/maj9-wide-spread",
       "timbre": "formant",
       "voicing": "maj9-wide-spread",
-      "ms": 152.4,
+      "ms": 101,
       "truth": [
         36,
         55,
@@ -4123,6 +3643,7 @@
         71,
         74,
         76,
+        79,
         83
       ],
       "hits": [
@@ -4130,16 +3651,15 @@
         55,
         64,
         71,
-        74
+        74,
+        79
       ],
       "ghosts": [
         48,
         76,
         83
       ],
-      "misses": [
-        79
-      ],
+      "misses": [],
       "oct": 3,
       "fifth": 0,
       "oth": 0
@@ -4148,7 +3668,7 @@
       "id": "formant/low-bass-E1",
       "timbre": "formant",
       "voicing": "low-bass-E1",
-      "ms": 124,
+      "ms": 101.1,
       "truth": [
         28,
         35,
@@ -4165,8 +3685,7 @@
         56,
         64,
         66,
-        71,
-        85
+        71
       ],
       "hits": [
         28,
@@ -4180,19 +3699,18 @@
         56,
         64,
         66,
-        71,
-        85
+        71
       ],
       "misses": [],
       "oct": 2,
       "fifth": 2,
-      "oth": 3
+      "oth": 2
     },
     {
       "id": "formant/low-bass-C1",
       "timbre": "formant",
       "voicing": "low-bass-C1",
-      "ms": 136.8,
+      "ms": 101.9,
       "truth": [
         24,
         31,
@@ -4207,8 +3725,7 @@
         55,
         71,
         74,
-        79,
-        107
+        79
       ],
       "hits": [
         31,
@@ -4220,8 +3737,7 @@
         55,
         71,
         74,
-        79,
-        107
+        79
       ],
       "misses": [
         24,
@@ -4229,13 +3745,13 @@
       ],
       "oct": 2,
       "fifth": 2,
-      "oth": 3
+      "oth": 2
     },
     {
       "id": "formant/guitar-open-E",
       "timbre": "formant",
       "voicing": "guitar-open-E",
-      "ms": 158,
+      "ms": 98,
       "truth": [
         40,
         47,
@@ -4280,7 +3796,7 @@
       "id": "formant/guitar-open-A",
       "timbre": "formant",
       "voicing": "guitar-open-A",
-      "ms": 147.6,
+      "ms": 98.9,
       "truth": [
         45,
         52,
@@ -4289,8 +3805,6 @@
         64
       ],
       "detected": [
-        22,
-        23,
         45,
         52,
         57,
@@ -4304,8 +3818,6 @@
         57
       ],
       "ghosts": [
-        22,
-        23,
         69,
         73,
         80
@@ -4315,14 +3827,14 @@
         64
       ],
       "oct": 2,
-      "fifth": 2,
-      "oth": 1
+      "fifth": 1,
+      "oth": 0
     },
     {
       "id": "formant/guitar-open-G",
       "timbre": "formant",
       "voicing": "guitar-open-G",
-      "ms": 158.5,
+      "ms": 100.3,
       "truth": [
         43,
         47,
@@ -4337,7 +3849,6 @@
         50,
         55,
         59,
-        74,
         78,
         83
       ],
@@ -4349,14 +3860,13 @@
         59
       ],
       "ghosts": [
-        74,
         78,
         83
       ],
       "misses": [
         67
       ],
-      "oct": 2,
+      "oct": 1,
       "fifth": 1,
       "oth": 0
     },
@@ -4364,7 +3874,7 @@
       "id": "formant/guitar-barre-F",
       "timbre": "formant",
       "voicing": "guitar-barre-F",
-      "ms": 128.7,
+      "ms": 104.8,
       "truth": [
         41,
         48,
@@ -4378,6 +3888,8 @@
         48,
         53,
         57,
+        60,
+        69,
         72,
         76,
         77,
@@ -4387,19 +3899,20 @@
         41,
         48,
         53,
-        57
+        57,
+        60
       ],
       "ghosts": [
+        69,
         72,
         76,
         77,
         79
       ],
       "misses": [
-        60,
         65
       ],
-      "oct": 2,
+      "oct": 3,
       "fifth": 2,
       "oth": 0
     },
@@ -4407,7 +3920,7 @@
       "id": "formant/quartal-stack",
       "timbre": "formant",
       "voicing": "quartal-stack",
-      "ms": 129.3,
+      "ms": 97.6,
       "truth": [
         45,
         50,
@@ -4417,8 +3930,6 @@
         70
       ],
       "detected": [
-        21,
-        22,
         45,
         50,
         55,
@@ -4438,8 +3949,6 @@
         70
       ],
       "ghosts": [
-        21,
-        22,
         72,
         74,
         77,
@@ -4449,7 +3958,7 @@
       "misses": [
         60
       ],
-      "oct": 7,
+      "oct": 5,
       "fifth": 0,
       "oth": 0
     },
@@ -4457,17 +3966,13 @@
       "id": "inharmonic/triad-close-Cmaj",
       "timbre": "inharmonic",
       "voicing": "triad-close-Cmaj",
-      "ms": 129.7,
+      "ms": 99.2,
       "truth": [
         60,
         64,
         67
       ],
       "detected": [
-        32,
-        35,
-        36,
-        41,
         60,
         64,
         67
@@ -4477,22 +3982,17 @@
         64,
         67
       ],
-      "ghosts": [
-        32,
-        35,
-        36,
-        41
-      ],
+      "ghosts": [],
       "misses": [],
-      "oct": 1,
-      "fifth": 2,
-      "oth": 1
+      "oct": 0,
+      "fifth": 0,
+      "oth": 0
     },
     {
       "id": "inharmonic/triad-open-Cmaj",
       "timbre": "inharmonic",
       "voicing": "triad-open-Cmaj",
-      "ms": 144.3,
+      "ms": 99.9,
       "truth": [
         48,
         55,
@@ -4500,10 +4000,6 @@
         72
       ],
       "detected": [
-        22,
-        23,
-        24,
-        25,
         48,
         55,
         64,
@@ -4515,22 +4011,17 @@
         64,
         72
       ],
-      "ghosts": [
-        22,
-        23,
-        24,
-        25
-      ],
+      "ghosts": [],
       "misses": [],
-      "oct": 1,
-      "fifth": 1,
-      "oth": 2
+      "oct": 0,
+      "fifth": 0,
+      "oth": 0
     },
     {
       "id": "inharmonic/min7-A-close",
       "timbre": "inharmonic",
       "voicing": "min7-A-close",
-      "ms": 134.6,
+      "ms": 98.7,
       "truth": [
         57,
         60,
@@ -4538,8 +4029,6 @@
         67
       ],
       "detected": [
-        21,
-        30,
         57,
         60,
         64,
@@ -4551,20 +4040,17 @@
         64,
         67
       ],
-      "ghosts": [
-        21,
-        30
-      ],
+      "ghosts": [],
       "misses": [],
-      "oct": 1,
+      "oct": 0,
       "fifth": 0,
-      "oth": 1
+      "oth": 0
     },
     {
       "id": "inharmonic/dim7-Fs",
       "timbre": "inharmonic",
       "voicing": "dim7-Fs",
-      "ms": 131.9,
+      "ms": 99.8,
       "truth": [
         54,
         57,
@@ -4572,10 +4058,6 @@
         63
       ],
       "detected": [
-        22,
-        30,
-        33,
-        35,
         54,
         57,
         60,
@@ -4587,22 +4069,17 @@
         60,
         63
       ],
-      "ghosts": [
-        22,
-        30,
-        33,
-        35
-      ],
+      "ghosts": [],
       "misses": [],
-      "oct": 2,
-      "fifth": 2,
+      "oct": 0,
+      "fifth": 0,
       "oth": 0
     },
     {
       "id": "inharmonic/dom7-G-low",
       "timbre": "inharmonic",
       "voicing": "dom7-G-low",
-      "ms": 134.3,
+      "ms": 101.2,
       "truth": [
         43,
         47,
@@ -4631,7 +4108,7 @@
       "id": "inharmonic/maj7-C-open",
       "timbre": "inharmonic",
       "voicing": "maj7-C-open",
-      "ms": 122.3,
+      "ms": 103,
       "truth": [
         48,
         55,
@@ -4639,9 +4116,6 @@
         64
       ],
       "detected": [
-        21,
-        22,
-        23,
         48,
         55,
         59,
@@ -4653,21 +4127,17 @@
         59,
         64
       ],
-      "ghosts": [
-        21,
-        22,
-        23
-      ],
+      "ghosts": [],
       "misses": [],
-      "oct": 1,
-      "fifth": 1,
-      "oth": 1
+      "oct": 0,
+      "fifth": 0,
+      "oth": 0
     },
     {
       "id": "inharmonic/min7-D-close",
       "timbre": "inharmonic",
       "voicing": "min7-D-close",
-      "ms": 162.5,
+      "ms": 102.1,
       "truth": [
         50,
         53,
@@ -4675,8 +4145,6 @@
         60
       ],
       "detected": [
-        21,
-        22,
         50,
         53,
         57,
@@ -4688,20 +4156,17 @@
         57,
         60
       ],
-      "ghosts": [
-        21,
-        22
-      ],
+      "ghosts": [],
       "misses": [],
-      "oct": 1,
-      "fifth": 1,
+      "oct": 0,
+      "fifth": 0,
       "oth": 0
     },
     {
       "id": "inharmonic/dom9-F",
       "timbre": "inharmonic",
       "voicing": "dom9-F",
-      "ms": 122.8,
+      "ms": 99.7,
       "truth": [
         41,
         45,
@@ -4733,7 +4198,7 @@
       "id": "inharmonic/dom13-Bb",
       "timbre": "inharmonic",
       "voicing": "dom13-Bb",
-      "ms": 123.2,
+      "ms": 97.7,
       "truth": [
         46,
         50,
@@ -4743,7 +4208,6 @@
         68
       ],
       "detected": [
-        22,
         46,
         50,
         56,
@@ -4759,11 +4223,9 @@
         65,
         68
       ],
-      "ghosts": [
-        22
-      ],
+      "ghosts": [],
       "misses": [],
-      "oct": 1,
+      "oct": 0,
       "fifth": 0,
       "oth": 0
     },
@@ -4771,7 +4233,7 @@
       "id": "inharmonic/min11-E-wide",
       "timbre": "inharmonic",
       "voicing": "min11-E-wide",
-      "ms": 153.9,
+      "ms": 99.8,
       "truth": [
         40,
         47,
@@ -4811,7 +4273,7 @@
       "id": "inharmonic/oct-quad-C",
       "timbre": "inharmonic",
       "voicing": "oct-quad-C",
-      "ms": 134.6,
+      "ms": 104.6,
       "truth": [
         36,
         48,
@@ -4821,31 +4283,29 @@
       "detected": [
         36,
         48,
+        60,
         72,
-        79,
-        88
+        79
       ],
       "hits": [
         36,
         48,
+        60,
         72
       ],
       "ghosts": [
-        79,
-        88
+        79
       ],
-      "misses": [
-        60
-      ],
+      "misses": [],
       "oct": 0,
       "fifth": 1,
-      "oth": 1
+      "oth": 0
     },
     {
       "id": "inharmonic/oct-triple-E",
       "timbre": "inharmonic",
       "voicing": "oct-triple-E",
-      "ms": 142.7,
+      "ms": 101.2,
       "truth": [
         40,
         52,
@@ -4877,18 +4337,13 @@
       "id": "inharmonic/cluster-semitone",
       "timbre": "inharmonic",
       "voicing": "cluster-semitone",
-      "ms": 140.5,
+      "ms": 104.2,
       "truth": [
         60,
         61,
         62
       ],
       "detected": [
-        25,
-        26,
-        29,
-        30,
-        43,
         60,
         61,
         62
@@ -4898,66 +4353,46 @@
         61,
         62
       ],
-      "ghosts": [
-        25,
-        26,
-        29,
-        30,
-        43
-      ],
+      "ghosts": [],
       "misses": [],
-      "oct": 2,
-      "fifth": 3,
+      "oct": 0,
+      "fifth": 0,
       "oth": 0
     },
     {
       "id": "inharmonic/cluster-C-Cs-G",
       "timbre": "inharmonic",
       "voicing": "cluster-C-Cs-G",
-      "ms": 150,
+      "ms": 99.3,
       "truth": [
         60,
         61,
         67
       ],
       "detected": [
-        21,
-        22,
-        23,
-        24,
-        25,
-        42,
-        43,
         60,
+        61,
         67,
         86
       ],
       "hits": [
         60,
+        61,
         67
       ],
       "ghosts": [
-        21,
-        22,
-        23,
-        24,
-        25,
-        42,
-        43,
         86
       ],
-      "misses": [
-        61
-      ],
-      "oct": 3,
-      "fifth": 2,
-      "oth": 3
+      "misses": [],
+      "oct": 0,
+      "fifth": 1,
+      "oth": 0
     },
     {
       "id": "inharmonic/maj9-wide-spread",
       "timbre": "inharmonic",
       "voicing": "maj9-wide-spread",
-      "ms": 134.9,
+      "ms": 98.8,
       "truth": [
         36,
         55,
@@ -4992,7 +4427,7 @@
       "id": "inharmonic/low-bass-E1",
       "timbre": "inharmonic",
       "voicing": "low-bass-E1",
-      "ms": 148.5,
+      "ms": 98.6,
       "truth": [
         28,
         35,
@@ -5003,32 +4438,30 @@
         28,
         35,
         40,
-        47,
         52,
-        66,
-        108
+        66
       ],
       "hits": [
         28,
         35,
-        40,
-        47
+        40
       ],
       "ghosts": [
         52,
-        66,
-        108
+        66
       ],
-      "misses": [],
+      "misses": [
+        47
+      ],
       "oct": 1,
       "fifth": 1,
-      "oth": 1
+      "oth": 0
     },
     {
       "id": "inharmonic/low-bass-C1",
       "timbre": "inharmonic",
       "voicing": "low-bass-C1",
-      "ms": 141.7,
+      "ms": 98.4,
       "truth": [
         24,
         31,
@@ -5041,8 +4474,7 @@
         43,
         48,
         55,
-        62,
-        105
+        62
       ],
       "hits": [
         24,
@@ -5052,21 +4484,20 @@
       "ghosts": [
         48,
         55,
-        62,
-        105
+        62
       ],
       "misses": [
         36
       ],
       "oct": 2,
       "fifth": 1,
-      "oth": 1
+      "oth": 0
     },
     {
       "id": "inharmonic/guitar-open-E",
       "timbre": "inharmonic",
       "voicing": "guitar-open-E",
-      "ms": 142.4,
+      "ms": 98.9,
       "truth": [
         40,
         47,
@@ -5080,9 +4511,7 @@
         47,
         52,
         56,
-        64,
-        78,
-        80
+        64
       ],
       "hits": [
         40,
@@ -5091,22 +4520,19 @@
         56,
         64
       ],
-      "ghosts": [
-        78,
-        80
-      ],
+      "ghosts": [],
       "misses": [
         59
       ],
-      "oct": 1,
-      "fifth": 1,
+      "oct": 0,
+      "fifth": 0,
       "oth": 0
     },
     {
       "id": "inharmonic/guitar-open-A",
       "timbre": "inharmonic",
       "voicing": "guitar-open-A",
-      "ms": 129,
+      "ms": 99.6,
       "truth": [
         45,
         52,
@@ -5120,7 +4546,6 @@
         57,
         61,
         71,
-        73,
         76
       ],
       "hits": [
@@ -5131,13 +4556,12 @@
       ],
       "ghosts": [
         71,
-        73,
         76
       ],
       "misses": [
         64
       ],
-      "oct": 2,
+      "oct": 1,
       "fifth": 1,
       "oth": 0
     },
@@ -5145,7 +4569,7 @@
       "id": "inharmonic/guitar-open-G",
       "timbre": "inharmonic",
       "voicing": "guitar-open-G",
-      "ms": 127.7,
+      "ms": 114.2,
       "truth": [
         43,
         47,
@@ -5159,8 +4583,7 @@
         47,
         50,
         59,
-        67,
-        83
+        67
       ],
       "hits": [
         43,
@@ -5169,13 +4592,11 @@
         59,
         67
       ],
-      "ghosts": [
-        83
-      ],
+      "ghosts": [],
       "misses": [
         55
       ],
-      "oct": 1,
+      "oct": 0,
       "fifth": 0,
       "oth": 0
     },
@@ -5183,7 +4604,7 @@
       "id": "inharmonic/guitar-barre-F",
       "timbre": "inharmonic",
       "voicing": "guitar-barre-F",
-      "ms": 127.7,
+      "ms": 119.4,
       "truth": [
         41,
         48,
@@ -5198,8 +4619,7 @@
         53,
         57,
         72,
-        77,
-        93
+        77
       ],
       "hits": [
         41,
@@ -5209,14 +4629,13 @@
       ],
       "ghosts": [
         72,
-        77,
-        93
+        77
       ],
       "misses": [
         60,
         65
       ],
-      "oct": 3,
+      "oct": 2,
       "fifth": 0,
       "oth": 0
     },
@@ -5224,7 +4643,7 @@
       "id": "inharmonic/quartal-stack",
       "timbre": "inharmonic",
       "voicing": "quartal-stack",
-      "ms": 125.7,
+      "ms": 118.3,
       "truth": [
         45,
         50,

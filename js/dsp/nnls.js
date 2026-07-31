@@ -40,14 +40,33 @@ function logSpec(magAvg,sr,n,a4){
   for(let k=0;k<NB;k++){ let s=0; const ii=idx[k],ww=wts[k]; for(let q=0;q<ii.length;q++) s+=magAvg[ii[q]]*ww[q]; y[k]=s; }
   return y;
 }
-/* running standardisation over ±1 octave -> spectral whitening */
-function whiten(y){
+/* Running standardisation over ±1 octave -> spectral whitening.
+
+   The local σ is floored at a fraction of the whole spectrum's RMS. Without
+   that floor it was floored only at 1e-12, which is a guard against dividing
+   by zero, not a statement about audio: in a band holding no chord energy the
+   local σ collapses to the noise floor and that band's noise standardises up
+   to a real partial's z-score. Because the fundamental-evidence gate reads
+   the whitened spectrum, the gate meant to reject invented notes was running
+   in the coordinate system that invented them.
+
+   Measured: this was 38% of all ghosts, essentially all of them below the
+   chord's bass. Flooring at 0.3 takes F1 0.658 -> 0.790 with recall
+   unchanged. The curve is broad — a factor of ten in the constant moves F1
+   by ~0.04 — which is what you want from a noise floor.
+
+   Known risk: a genuinely quiet low bass more than ~40 dB below the spectral
+   RMS would be suppressed. The corpus has low bass but never quiet low bass,
+   so this is untested rather than ruled out. */
+function whiten(y,wfloor=0.3){
   const W=12*BPS, out=new Float32Array(NB);
   const c=new Float64Array(NB+1), c2=new Float64Array(NB+1);
-  for(let i=0;i<NB;i++){ c[i+1]=c[i]+y[i]; c2[i+1]=c2[i]+y[i]*y[i]; }
+  let en=0;
+  for(let i=0;i<NB;i++){ c[i+1]=c[i]+y[i]; c2[i+1]=c2[i]+y[i]*y[i]; en+=y[i]*y[i]; }
+  const fl=Math.pow(wfloor*Math.sqrt(en/NB),2);
   for(let i=0;i<NB;i++){
     const a=Math.max(0,i-W), b=Math.min(NB,i+W+1), m=b-a;
-    const mu=(c[b]-c[a])/m, va=Math.max(1e-12,(c2[b]-c2[a])/m-mu*mu);
+    const mu=(c[b]-c[a])/m, va=Math.max(fl,1e-12,(c2[b]-c2[a])/m-mu*mu);
     out[i]=Math.max(0,(y[i]-mu)/Math.sqrt(va));
   }
   return out;

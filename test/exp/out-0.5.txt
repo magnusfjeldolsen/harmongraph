@@ -1,0 +1,184 @@
+voice clustering — profiles-0.5.json  (0.5 s segments, 324 segments, 96 two-instrument mixtures)
+
+0. The prerequisite: does the detector even find both instruments?
+==================================================================
+slice                 n   recall A  recall B   ghost frac   both found
+ALL MIXTURES          96    86.8%    38.4%       35.0%       51.0%
+  dark+bright         24    84.7%    41.7%       25.7%       54.2%
+  geometric+inharmonic  24    91.0%    53.5%       18.2%       70.8%
+  hollow+formant      24    81.9%    32.6%       44.3%       41.7%
+  bright+formant      24    89.6%    25.7%       51.6%       37.5%
+  separate            36    87.0%    76.4%       28.8%       94.4%
+  interleave          36    86.1%    17.6%       40.3%       27.8%
+  shared              24    87.5%    12.5%       36.2%       20.8%
+  B at 0 dB           32    84.4%    54.2%       35.5%       68.8%
+  B at -6 dB          32    88.0%    42.2%       37.1%       53.1%
+  B at -12 dB         32    88.0%    18.8%       32.3%       31.3%
+
+1 + 3. Accuracy with k known = 2, and which fingerprint carries it
+==================================================================
+
+--- oracle notes ---
+fingerprint    n      kmeans          ward          average          GMM
+                      acc   ARI      acc   ARI      acc   ARI      acc   ARI
+logP           96     81.9 0.422   82.6 0.426   79.0 0.326   80.9 0.389
+dbFund         96     82.2 0.378   81.2 0.353   78.6 0.284   79.3 0.297
+shape          96     84.7 0.487   83.7 0.465   82.5 0.412   81.5 0.398
+inharmB        96     70.6 0.105   70.8 0.105   71.0 0.105   71.7 0.133
+shapeB         96     84.8 0.491   83.9 0.470   82.0 0.404   83.5 0.450
+logPB          96     83.0 0.445   82.2 0.422   78.7 0.311   81.1 0.395
+logPattr       96     80.0 0.328   80.6 0.343   77.3 0.268   78.7 0.311
+logP6          96     75.5 0.207   75.0 0.205   72.6 0.137   73.7 0.169
+all            96     85.2 0.511   85.6 0.526   81.8 0.389   84.5 0.503
+
+--- detected notes ---
+fingerprint    n      kmeans          ward          average          GMM
+                      acc   ARI      acc   ARI      acc   ARI      acc   ARI
+logP           49     78.4 0.354   78.0 0.338   76.2 0.304   78.0 0.339
+dbFund         49     72.4 0.190   70.6 0.127   69.3 0.126   71.5 0.125
+shape          49     83.5 0.524   84.0 0.530   83.8 0.531   84.1 0.536
+inharmB        49     70.3 0.104   69.7 0.100   70.9 0.130   70.0 0.110
+shapeB         49     83.6 0.517   83.1 0.522   81.2 0.466   82.2 0.483
+logPB          49     78.0 0.357   77.2 0.325   77.6 0.329   77.6 0.333
+logPattr       49     76.6 0.317   75.9 0.307   73.7 0.262   74.4 0.288
+logP6          49     69.8 0.088   68.8 0.077   65.8 0.022   69.9 0.093
+all            49     79.4 0.401   78.0 0.360   76.4 0.309   77.2 0.326
+
+winner (oracle, ward, mean accuracy): logP
+
+the two baselines every row above has to beat:
+                       oracle              detected
+  random relabelling  n= 96 acc  68.8% ARI 0.009   n= 49 acc  67.1% ARI 0.006
+  MIDI pitch alone    n= 96 acc  86.5% ARI 0.584   n= 49 acc  90.4% ARI 0.695
+  (best-of-2-permutation accuracy is NOT 50% at chance — with few notes it is much higher,
+   which is why ARI, whose chance value is 0.000 by construction, is the number to read)
+
+does the fingerprint beat MIDI pitch? (oracle, ward, by how the pitch sets sit)
+                real pairs                        identical-timbre control
+voicing        n   fingerprint      pitch        n   fingerprint      pitch
+  separate     36   86.6% 0.548  100.0% 1.000    54   76.5% 0.275  100.0% 1.000
+  interleave   36   75.9% 0.270   72.2% 0.224    54   68.5% 0.079   72.2% 0.224
+  shared       24   86.5% 0.479   87.5% 0.500    36   77.1% 0.264   87.5% 0.500
+
+2. Choosing the count blind — FALSE-SPLIT RATE FIRST
+====================================================
+
+detected notes, fingerprint = logP
+selector             false-split  mean k     2-inst correct  mean k
+                     (n= 83 solos)             (n= 95 mixtures)
+silhouette τ=0.30     57.8%   1.723       61.1%       1.695
+silhouette τ=0.40     30.1%   1.349       37.9%       1.421
+silhouette τ=0.55      6.0%   1.060       16.8%       1.168
+silhouette τ=0.70      0.0%   1.000        3.2%       1.032
+gap statistic         63.9%   2.024       31.6%       2.179
+eigengap (global σ)    0.0%   1.000        0.0%       1.000
+eigengap (local σ)     8.4%   1.084        5.3%       1.074
+GMM BIC               91.6%   2.217       57.9%       2.221
+
+oracle notes, fingerprint = logP
+selector             false-split  mean k     2-inst correct  mean k
+                     (n= 84 solos)             (n= 96 mixtures)
+silhouette τ=0.30     22.6%   1.226       37.5%       1.500
+silhouette τ=0.40     10.7%   1.107       14.6%       1.229
+silhouette τ=0.55      0.0%   1.000        0.0%       1.000
+silhouette τ=0.70      0.0%   1.000        0.0%       1.000
+gap statistic         32.1%   1.417       30.2%       1.802
+eigengap (global σ)    0.0%   1.000        0.0%       1.000
+eigengap (local σ)     0.0%   1.000        0.0%       1.000
+GMM BIC               88.1%   2.071       37.5%       2.063
+
+oracle notes, fingerprint = shape
+selector             false-split  mean k     2-inst correct  mean k
+                     (n= 84 solos)             (n= 96 mixtures)
+silhouette τ=0.30     51.2%   1.560       76.0%       2.104
+silhouette τ=0.40     25.0%   1.274       52.1%       1.792
+silhouette τ=0.55      4.8%   1.060       11.5%       1.198
+silhouette τ=0.70      0.0%   1.000        3.1%       1.031
+gap statistic         52.4%   1.679       51.0%       2.156
+eigengap (global σ)    0.0%   1.000        0.0%       1.000
+eigengap (local σ)     2.4%   1.024        7.3%       1.073
+GMM BIC               84.5%   2.024       26.0%       1.854
+
+4. Where it breaks — ward, k known = 2
+======================================
+
+by timbre distance                oracle              detected
+  close                 n= 24 acc  73.6% ARI 0.182   n= 17 acc  73.0% ARI 0.215
+  far                   n= 24 acc  88.2% ARI 0.566   n= 13 acc  82.8% ARI 0.448
+  mid                   n= 48 acc  84.2% ARI 0.479   n= 19 acc  79.0% ARI 0.372
+
+by voicing relation                oracle              detected
+  interleave            n= 36 acc  75.9% ARI 0.270   n= 10 acc  66.2% ARI -0.072
+  separate              n= 36 acc  86.6% ARI 0.548   n= 34 acc  81.9% ARI 0.479
+  shared                n= 24 acc  86.5% ARI 0.479   n=  5 acc  75.0% ARI 0.200
+
+by level of instrument B (dB)                oracle              detected
+  -12                   n= 32 acc  82.0% ARI 0.394   n= 10 acc  89.0% ARI 0.623
+  -6                    n= 32 acc  80.7% ARI 0.361   n= 17 acc  77.1% ARI 0.303
+  0                     n= 32 acc  84.9% ARI 0.524   n= 22 acc  73.6% ARI 0.236
+
+by instrument pair                oracle              detected
+  bright+formant        n= 24 acc  86.8% ARI 0.560   n=  9 acc  82.6% ARI 0.556
+  dark+bright           n= 24 acc  88.2% ARI 0.566   n= 13 acc  82.8% ARI 0.448
+  geometric+inharmonic  n= 24 acc  73.6% ARI 0.182   n= 17 acc  73.0% ARI 0.215
+  hollow+formant        n= 24 acc  81.6% ARI 0.398   n= 10 acc  75.8% ARI 0.208
+
+2b. Can ANY threshold work? AUC of each statistic, solo vs two-instrument
+=========================================================================
+   0.500 = the statistic cannot tell a solo from a duet at any threshold
+
+feature  mode        n     silhouette   gap    GMM BIC   eigen σ   eigen local
+logP     oracle      84/96      0.681   0.546    0.424     0.869      0.873
+logP     detected    83/95      0.581   0.501    0.546     0.630      0.632
+shape    oracle      84/96      0.779   0.567    0.392     0.886      0.886
+shape    detected    83/95      0.513   0.408    0.463     0.644      0.661
+logP     oracle      84/96      0.681   0.546    0.424     0.869      0.873
+logP     detected    83/95      0.581   0.501    0.546     0.630      0.632
+
+same statistics asked to separate a real duet from two players of the SAME instrument:
+feature  mode        silhouette   gap    GMM BIC   eigen σ   eigen local
+logP     oracle         0.573   0.565    0.617     0.553      0.536
+logP     detected       0.568   0.556    0.539     0.514      0.519
+shape    oracle         0.512   0.480    0.577     0.403      0.431
+shape    detected       0.532   0.495    0.571     0.479      0.500
+logP     oracle         0.573   0.565    0.617     0.553      0.536
+logP     detected       0.568   0.556    0.539     0.514      0.519
+
+THE CONTROL: two players of the same instrument
+===============================================
+n=144 segments in which there is no timbre difference to find.
+A real pair's accuracy only counts insofar as it exceeds this column.
+
+fingerprint    identical pair    real pairs      lift
+               acc     ARI       acc     ARI     acc     ARI
+logP          73.7% 0.199     82.6% 0.426   +8.9pp  +0.228
+dbFund        77.5% 0.293     81.2% 0.353   +3.6pp  +0.059
+shape         79.3% 0.343     83.7% 0.465   +4.3pp  +0.123
+inharmB       67.9% 0.046     70.8% 0.105   +3.0pp  +0.059
+shapeB        80.3% 0.363     83.9% 0.470   +3.7pp  +0.107
+logPB         74.1% 0.207     82.2% 0.422   +8.1pp  +0.215
+logPattr      72.7% 0.150     80.6% 0.343   +8.0pp  +0.194
+logP6         71.0% 0.156     75.0% 0.205   +4.0pp  +0.048
+all           77.5% 0.299     85.6% 0.526   +8.0pp  +0.227
+
+by timbre (fingerprint logP):
+  geometric   n= 24  acc  75.7%
+  bright      n= 24  acc  71.9%
+  dark        n= 24  acc  76.4%
+  hollow      n= 24  acc  62.2%
+  formant     n= 24  acc  82.6%
+  inharmonic  n= 24  acc  73.3%
+
+other hygiene
+=============
+detected notes over the whole corpus: 1872, of which 624 ghosts (33.3%) and 75 shared pitches (4.0%)
+k-means instability over 20 seeds at k=2 (oracle, logP):
+  1 k-means++ init   97.9% of segments give more than one partition, mean modal share 0.518
+ 10 restarts        30.2% of segments give more than one partition, mean modal share 0.966
+
+5. Runtime of the added step
+============================
+  partial-profile extraction       mean 0.18 ms, max 0.68 ms
+  features + ward + silhouette     mean 0.23 ms, max 0.66 ms
+  features + ward + all 4 selectors mean 5.00 ms, max 11.24 ms
+  (analyzeSegment itself           mean 20 ms, budget 900 ms)

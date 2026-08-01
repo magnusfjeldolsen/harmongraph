@@ -128,13 +128,13 @@ function partials(timbre, midi){
   throw new Error('unknown timbre '+timbre);
 }
 
-/* ---------------- one chord ---------------- */
-function synth(notes, timbre, seed){
-  const N=Math.round(SR*DUR);
-  const buf=new Float32Array(N);
-  const rand=rng(seed);
-  const nyq=SR/2;
-
+/* ---------------- one player's notes, summed into `buf` ----------------
+   Pulled out of synth() unchanged so a mixture can render two players
+   into the same buffer with independent PRNG streams and a relative
+   gain. With gain=1 the arithmetic is bit-identical to the original
+   (1*lvl === lvl), so the 132-chord baseline does not move. */
+function renderNotes(buf, notes, timbre, rand, gain=1){
+  const N=buf.length, nyq=SR/2;
   notes.forEach((midi,ni)=>{
     const f0=440*Math.pow(2,(midi-69)/12);
     const {out:ps, B}=partials(timbre,midi);
@@ -151,7 +151,7 @@ function synth(notes, timbre, seed){
       if(f>=nyq*0.97) return;
       const ph=2*Math.PI*rand();
       const th=tau/(1+0.10*(h-1));
-      const a=lvl*amp;
+      const a=gain*lvl*amp;
       const w=2*Math.PI*f/SR;
       for(let i=0;i<N;i++){
         const t=i/SR-t0;
@@ -162,7 +162,11 @@ function synth(notes, timbre, seed){
       }
     });
   });
+}
 
+/* noise + peak normalise, shared by the solo and mixture paths */
+function finish(buf, rand){
+  const N=buf.length;
   // a little broadband noise so this is not a pure sinusoid stack
   let pk=0; for(let i=0;i<N;i++) if(Math.abs(buf[i])>pk) pk=Math.abs(buf[i]);
   const nz=pk*0.0035;
@@ -172,6 +176,15 @@ function synth(notes, timbre, seed){
   const g=pk>0?0.9/pk:1;
   for(let i=0;i<N;i++) buf[i]*=g;
   return buf;
+}
+
+/* ---------------- one chord ---------------- */
+function synth(notes, timbre, seed, dur=DUR){
+  const N=Math.round(SR*dur);
+  const buf=new Float32Array(N);
+  const rand=rng(seed);
+  renderNotes(buf,notes,timbre,rand,1);
+  return finish(buf,rand);
 }
 
 /* ---------------- the corpus ----------------
@@ -193,6 +206,155 @@ export function* corpus(){
   }
 }
 
+/* ============================================================
+   TWO-INSTRUMENT MIXTURES  (added for the voice-clustering study)
+
+   Each segment is two players rendered with independent PRNG
+   streams and summed, so the same "player A" part is bit-identical
+   whether it appears alone or inside a mixture. That makes the solo
+   control and the mixture directly comparable: any difference in
+   the clustering is caused by the second instrument, not by a
+   different rendering of the first.
+
+   The axes are chosen to be the things that should break the
+   method, not the things that should flatter it:
+
+     pair        how far apart the two timbres are
+     arrangement how the two pitch sets sit against each other —
+                 separate registers, interleaved, octave-related
+                 (maximal partial collision without unison), and
+                 outright shared pitches
+     level       instrument B at 0, −6 or −12 dB
+
+   Solo segments carry `k:1` and exist for one number only: how
+   often a one-instrument segment is reported as more than one
+   voice.
+   ============================================================ */
+
+export const PAIRS = [
+  {id:'dark+bright',         A:'dark',      B:'bright',     dist:'far'},
+  {id:'geometric+inharmonic',A:'geometric', B:'inharmonic', dist:'close'},
+  {id:'hollow+formant',      A:'hollow',    B:'formant',    dist:'mid'},
+  {id:'bright+formant',      A:'bright',    B:'formant',    dist:'mid'},
+  // The control that matters: two players of the *same* instrument.
+  // There is no timbral evidence to find, so whatever the method scores
+  // here it read out of something that is not timbre — register,
+  // partial-collision pattern, position in the chord. Any accuracy on a
+  // real pair only counts insofar as it exceeds this. One per timbre,
+  // because the artefact could be timbre-specific.
+  ...TIMBRES.map(t=>({id:`${t}+${t}`, A:t, B:t, dist:'identical'}))
+];
+
+export const ARRANGEMENTS = [
+  {id:'sep-register',   A:[36,43,48],    B:[64,67,71],    kind:'separate'},
+  {id:'sep-wide',       A:[28,35,40],    B:[72,76,79],    kind:'separate'},
+  {id:'melody-chord',   A:[43,50,55,59], B:[76,79],       kind:'separate'},
+  {id:'interleave',     A:[48,60,67],    B:[55,64,72],    kind:'interleave'},
+  {id:'interleave-tight',A:[60,64,67],   B:[62,65,69],    kind:'interleave'},
+  // every B note is exactly an octave above an A note: every partial of
+  // B lands on an even partial of A. Collision without unison.
+  {id:'octave-apart',   A:[48,52,55],    B:[60,64,67],    kind:'interleave'},
+  {id:'share-1',        A:[48,55,60],    B:[60,64,67],    kind:'shared'},
+  {id:'share-2',        A:[52,55,59,64], B:[55,59,62,67], kind:'shared'}
+];
+
+export const LEVELS_DB = [0,-6,-12];
+
+/* dense solo chords, on top of the arrangement A-parts, so the
+   false-split rate is not measured only on 3-note voicings */
+export const SOLO_VOICINGS = ['triad-close-Cmaj','dom13-Bb','oct-quad-C',
+                              'guitar-open-E','cluster-C-Cs-G','maj9-wide-spread'];
+
+const rmsOf=b=>{ let s=0; for(let i=0;i<b.length;i++) s+=b[i]*b[i]; return Math.sqrt(s/b.length); };
+
+/* Each player is rendered into its own buffer and normalised to unit
+   RMS *before* the level offset is applied, so `0 dB` means the two
+   instruments are equally loud. Without that step the level axis
+   would be measuring the timbres' very different intrinsic energies
+   (`bright` has 20 partials, `dark` has 5) rather than anything the
+   experiment set. The two PRNG streams are independent, so player A's
+   samples do not depend on player B existing. */
+function synthMix(notesA,timbreA,notesB,timbreB,seed,gainB,dur=DUR){
+  const N=Math.round(SR*dur);
+  const bufA=new Float32Array(N), bufB=new Float32Array(N);
+  renderNotes(bufA,notesA,timbreA,rng(seed),1);
+  renderNotes(bufB,notesB,timbreB,rng(seed^0x5F3759DF),1);
+  const ra=rmsOf(bufA)||1, rb=rmsOf(bufB)||1;
+  const out=new Float32Array(N);
+  for(let i=0;i<N;i++) out[i]=bufA[i]/ra + gainB*bufB[i]/rb;
+  return finish(out,rng(seed+7919));
+}
+
+/* the mixture segments: PAIRS × ARRANGEMENTS × LEVELS_DB.
+   The identical-timbre control runs at 0 dB only. */
+export function* mixtures(dur=DUR){
+  for(let pi=0; pi<PAIRS.length; pi++){
+    const p=PAIRS[pi];
+    const levels = LEVELS_DB;
+    for(let ai=0; ai<ARRANGEMENTS.length; ai++){
+      const a=ARRANGEMENTS[ai];
+      for(const db of levels){
+        const seed = 0x1B7D + pi*10000 + ai*100 + (db+12);
+        const gainB = Math.pow(10,db/20);
+        const shared = a.A.filter(m=>a.B.includes(m));
+        yield {
+          id: `${p.id}/${a.id}/${db}dB`,
+          kind:'mix', k:2,
+          pair:p.id, dist:p.dist, arrangement:a.id, arrKind:a.kind, db,
+          timbreA:p.A, timbreB:p.B,
+          truthA:a.A.slice(), truthB:a.B.slice(), shared,
+          get signal(){ return synthMix(a.A,p.A,a.B,p.B,seed,gainB,dur); }
+        };
+      }
+    }
+  }
+}
+
+/* the solo controls: every timbre over every arrangement A-part, plus
+   six of the dense VOICINGS. Truth is one voice. */
+export function* solos(dur=DUR){
+  for(let ti=0; ti<TIMBRES.length; ti++){
+    const t=TIMBRES[ti];
+    for(let ai=0; ai<ARRANGEMENTS.length; ai++){
+      const a=ARRANGEMENTS[ai];
+      const seed = 0x2C4F + ti*1000 + ai;
+      yield { id:`solo/${t}/${a.id}`, kind:'solo', k:1,
+              pair:'—', dist:'solo', arrangement:a.id, arrKind:'solo', db:0,
+              timbreA:t, timbreB:null,
+              truthA:a.A.slice(), truthB:[], shared:[],
+              get signal(){ return synth(a.A,t,seed,dur); } };
+    }
+    for(let vi=0; vi<SOLO_VOICINGS.length; vi++){
+      const v=VOICINGS.find(x=>x.id===SOLO_VOICINGS[vi]);
+      const seed = 0x3D6A + ti*1000 + vi;
+      yield { id:`solo/${t}/${v.id}`, kind:'solo', k:1,
+              pair:'—', dist:'solo', arrangement:v.id, arrKind:'solo', db:0,
+              timbreA:t, timbreB:null,
+              truthA:v.notes.slice(), truthB:[], shared:[],
+              get signal(){ return synth(v.notes,t,seed,dur); } };
+    }
+  }
+}
+
+/* everything, solos first so a short run still sees the headline number */
+export function* voiceCorpus(dur=DUR){
+  yield* solos(dur);
+  yield* mixtures(dur);
+}
+
+/* one note list, one timbre, no mixture — exported so the isolated-note
+   diagnostic can render a single note through the same synthesiser the
+   corpus uses, rather than a second copy of the partial tables */
+export {synth as synthNote};
+
+export function voiceCorpusStats(){
+  let mix=0,solo=0;
+  for(const s of mixtures()) mix++;
+  for(const s of solos()) solo++;
+  return {mix, solo, total:mix+solo,
+          pairs:PAIRS.length, arrangements:ARRANGEMENTS.length, levels:LEVELS_DB.length};
+}
+
 export function corpusStats(){
   const chords=TIMBRES.length*VOICINGS.length;
   const perTimbre=VOICINGS.reduce((s,v)=>s+v.notes.length,0);
@@ -205,4 +367,7 @@ if(process.argv[1] && process.argv[1].endsWith('corpus.mjs')){
   console.log(`${s.voicings} voicings × ${s.timbres} timbres = ${s.chords} chords, ${s.notes} notes`);
   console.log(`${s.notesPerTimbre} notes per timbre, ${DUR}s each at ${SR} Hz`);
   for(const v of VOICINGS) console.log(`  ${v.id.padEnd(20)} ${String(v.notes.length).padStart(2)}  [${v.notes.join(' ')}]`);
+  const m=voiceCorpusStats();
+  console.log(`\nvoice corpus: ${m.mix} mixtures + ${m.solo} solos = ${m.total} segments`);
+  console.log(`  ${m.pairs} pairs × ${m.arrangements} arrangements × ${m.levels} levels`);
 }

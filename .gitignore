@@ -1,2 +1,7 @@
 # Claude Code local state and agent worktrees
 .claude/
+
+# Voice-clustering study intermediates: ~1.6 MB each, regenerated in ~4 min
+# by `node test/exp/extract.mjs --dur <n>`. The results derived from them
+# (report-*.json, out-*.txt, isolated.json) are committed.
+test/exp/profiles-*.json

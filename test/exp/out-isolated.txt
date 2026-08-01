@@ -1,0 +1,57 @@
+isolated-note diagnostic
+20 pitches × 6 timbres
+
+20 40 60 80 100 120 
+
+1. Do the fingerprints separate the six timbres on ISOLATED single notes?
+   (leave-one-out 1-NN over 6 classes; chance 16.7%)
+
+fingerprint    1-NN 6-way   d(same timbre,   d(same pitch,    within/between
+               accuracy     diff pitch)      diff timbre)     <1 is good
+logP         100.0%         1.063            4.666         0.228
+dbFund        98.3%         1.243            4.350         0.286
+shape         99.2%         1.042            3.220         0.324
+inharmB       45.8%         0.318            0.921         0.345
+shapeB       100.0%         1.212            3.642         0.333
+logPB        100.0%         1.218            5.011         0.243
+logPattr     100.0%         1.063            4.666         0.228
+logP6         96.7%         0.847            3.238         0.262
+all          100.0%         1.656            6.002         0.276
+
+2+3. How much does the SAME instrument playing a CHORD move the fingerprint?
+   (distance from a note's in-chord fingerprint to its own isolated one)
+
+fingerprint    poly shift   between-timbre   SNR = between/shift
+                            distance         (>1 needed for any clusterer)
+logP            2.576        4.666         1.811
+dbFund          1.650        4.350         2.636
+shape           1.204        3.220         2.674
+inharmB         0.851        0.921         1.082
+shapeB          1.640        3.642         2.220
+logPB           2.854        5.011         1.755
+logPattr        2.498        4.666         1.868
+logP6           1.699        3.238         1.905
+all             3.120        6.002         1.924
+
+shift vs polyphony, shape (the best SNR above):
+   3 notes sounding   n= 138   shift 0.956
+   4 notes sounding   n=  72   shift 1.320
+   6 notes sounding   n=  72   shift 1.565
+
+4. The same SNR, per instrument pair — the mean above hides the close pairs.
+   d = distance between the two timbres on the same isolated pitch;
+   SNR = d / the in-chord displacement of that fingerprint.
+
+fingerprint        dark+brig     geom+inha     holl+form     brig+form     geom+geom
+                  d    SNR      d    SNR      d    SNR      d    SNR      d    SNR  
+logP           8.254  3.204  1.266  0.491  5.365  2.083  2.355  0.914  0.000  0.000
+dbFund         7.516  4.555  0.834  0.505  5.883  3.565  2.760  1.673  0.000  0.000
+shape          5.601  4.651  0.678  0.563  4.044  3.358  2.225  1.848  0.000  0.000
+inharmB        0.394  0.463  2.429  2.855  0.066  0.078  0.064  0.075  0.000  0.000
+shapeB         5.623  3.428  2.549  1.554  4.045  2.466  2.227  1.357  0.000  0.000
+logPB          8.269  2.897  2.771  0.971  5.366  1.880  2.356  0.826  0.000  0.000
+logPattr       8.254  3.304  1.266  0.507  5.365  2.148  2.355  0.943  0.000  0.000
+logP6          4.368  2.571  0.468  0.275  5.048  2.971  1.778  1.046  0.000  0.000
+all            9.989  3.202  2.869  0.920  6.725  2.156  3.258  1.044  0.000  0.000
+
+wrote C:\Python\harmongraph\.claude\worktrees\agent-af4b28c0877f75050\test\exp\isolated.json

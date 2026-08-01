@@ -1,0 +1,578 @@
+{
+  "pitches": [
+    28,
+    35,
+    36,
+    40,
+    43,
+    48,
+    50,
+    52,
+    55,
+    59,
+    60,
+    62,
+    64,
+    65,
+    67,
+    69,
+    71,
+    72,
+    76,
+    79
+  ],
+  "timbres": [
+    "geometric",
+    "bright",
+    "dark",
+    "hollow",
+    "formant",
+    "inharmonic"
+  ],
+  "q1": [
+    {
+      "feature": "logP",
+      "nn6": 1,
+      "withinTimbre": 1.0628926540124717,
+      "betweenTimbre": 4.665972551303222,
+      "ratio": 0.2277965938131381
+    },
+    {
+      "feature": "dbFund",
+      "nn6": 0.9833333333333333,
+      "withinTimbre": 1.2427030083260793,
+      "betweenTimbre": 4.3498299648797385,
+      "ratio": 0.2856900196926288
+    },
+    {
+      "feature": "shape",
+      "nn6": 0.9916666666666667,
+      "withinTimbre": 1.0416723554331793,
+      "betweenTimbre": 3.2199974092559702,
+      "ratio": 0.32350099178305664
+    },
+    {
+      "feature": "inharmB",
+      "nn6": 0.4583333333333333,
+      "withinTimbre": 0.31780463269893966,
+      "betweenTimbre": 0.9210576172181391,
+      "ratio": 0.3450431620757904
+    },
+    {
+      "feature": "shapeB",
+      "nn6": 1,
+      "withinTimbre": 1.2124075320505714,
+      "betweenTimbre": 3.641799598812413,
+      "ratio": 0.33291440101370107
+    },
+    {
+      "feature": "logPB",
+      "nn6": 1,
+      "withinTimbre": 1.217693096365591,
+      "betweenTimbre": 5.010545331611861,
+      "ratio": 0.24302606119199938
+    },
+    {
+      "feature": "logPattr",
+      "nn6": 1,
+      "withinTimbre": 1.0628926540124717,
+      "betweenTimbre": 4.665972551303222,
+      "ratio": 0.2277965938131381
+    },
+    {
+      "feature": "logP6",
+      "nn6": 0.9666666666666667,
+      "withinTimbre": 0.8473590315497006,
+      "betweenTimbre": 3.2376115505169496,
+      "ratio": 0.26172350151592544
+    },
+    {
+      "feature": "all",
+      "nn6": 1,
+      "withinTimbre": 1.6555354590227138,
+      "betweenTimbre": 6.002351511741541,
+      "ratio": 0.27581447967254613
+    }
+  ],
+  "q2": [
+    {
+      "feature": "logP",
+      "polyShift": 2.5758899990563906,
+      "betweenTimbre": 4.665972551303222,
+      "snr": 1.811402099085162,
+      "byPoly": [
+        {
+          "notes": 3,
+          "n": 138,
+          "shift": 2.1506803934359744
+        },
+        {
+          "notes": 4,
+          "n": 72,
+          "shift": 2.865923638912572
+        },
+        {
+          "notes": 6,
+          "n": 72,
+          "shift": 3.100841436639347
+        }
+      ]
+    },
+    {
+      "feature": "dbFund",
+      "polyShift": 1.649981702234423,
+      "betweenTimbre": 4.3498299648797385,
+      "snr": 2.636289820056278,
+      "byPoly": [
+        {
+          "notes": 3,
+          "n": 138,
+          "shift": 1.3687324972447585
+        },
+        {
+          "notes": 4,
+          "n": 72,
+          "shift": 1.8150685667596385
+        },
+        {
+          "notes": 6,
+          "n": 72,
+          "shift": 2.0239558139393945
+        }
+      ]
+    },
+    {
+      "feature": "shape",
+      "polyShift": 1.204304566666984,
+      "betweenTimbre": 3.2199974092559702,
+      "snr": 2.6737400972974705,
+      "byPoly": [
+        {
+          "notes": 3,
+          "n": 138,
+          "shift": 0.9556280652202729
+        },
+        {
+          "notes": 4,
+          "n": 72,
+          "shift": 1.3197602833314037
+        },
+        {
+          "notes": 6,
+          "n": 72,
+          "shift": 1.565478811108759
+        }
+      ]
+    },
+    {
+      "feature": "inharmB",
+      "polyShift": 0.8510717526995726,
+      "betweenTimbre": 0.9210576172181391,
+      "snr": 1.082232625271105,
+      "byPoly": [
+        {
+          "notes": 3,
+          "n": 138,
+          "shift": 0.6765765112765482
+        },
+        {
+          "notes": 4,
+          "n": 72,
+          "shift": 0.872734278145313
+        },
+        {
+          "notes": 6,
+          "n": 72,
+          "shift": 1.1638584399812915
+        }
+      ]
+    },
+    {
+      "feature": "shapeB",
+      "polyShift": 1.6402815312585466,
+      "betweenTimbre": 3.641799598812413,
+      "snr": 2.2202283750754375,
+      "byPoly": [
+        {
+          "notes": 3,
+          "n": 138,
+          "shift": 1.28667126331495
+        },
+        {
+          "notes": 4,
+          "n": 72,
+          "shift": 1.8104094292978539
+        },
+        {
+          "notes": 6,
+          "n": 72,
+          "shift": 2.1479066467777987
+        }
+      ]
+    },
+    {
+      "feature": "logPB",
+      "polyShift": 2.854465359641472,
+      "betweenTimbre": 5.010545331611861,
+      "snr": 1.7553358336221667,
+      "byPoly": [
+        {
+          "notes": 3,
+          "n": 138,
+          "shift": 2.3412398249852298
+        },
+        {
+          "notes": 4,
+          "n": 72,
+          "shift": 3.2173656085726474
+        },
+        {
+          "notes": 6,
+          "n": 72,
+          "shift": 3.475247385468096
+        }
+      ]
+    },
+    {
+      "feature": "logPattr",
+      "polyShift": 2.498067865208151,
+      "betweenTimbre": 4.665972551303222,
+      "snr": 1.867832582248293,
+      "byPoly": [
+        {
+          "notes": 3,
+          "n": 138,
+          "shift": 2.189714541426875
+        },
+        {
+          "notes": 4,
+          "n": 72,
+          "shift": 2.7239558605753036
+        },
+        {
+          "notes": 6,
+          "n": 72,
+          "shift": 2.8631904070884535
+        }
+      ]
+    },
+    {
+      "feature": "logP6",
+      "polyShift": 1.6991844626963162,
+      "betweenTimbre": 3.2376115505169496,
+      "snr": 1.905391451955376,
+      "byPoly": [
+        {
+          "notes": 3,
+          "n": 138,
+          "shift": 1.542948274936291
+        },
+        {
+          "notes": 4,
+          "n": 72,
+          "shift": 1.9409571035933852
+        },
+        {
+          "notes": 6,
+          "n": 72,
+          "shift": 1.7568645150059583
+        }
+      ]
+    },
+    {
+      "feature": "all",
+      "polyShift": 3.119789881883434,
+      "betweenTimbre": 6.002351511741541,
+      "snr": 1.9239601828947173,
+      "byPoly": [
+        {
+          "notes": 3,
+          "n": 138,
+          "shift": 2.544956310478864
+        },
+        {
+          "notes": 4,
+          "n": 72,
+          "shift": 3.5020924821464803
+        },
+        {
+          "notes": 6,
+          "n": 72,
+          "shift": 3.8392516268124806
+        }
+      ]
+    }
+  ],
+  "q3": [
+    {
+      "feature": "logP",
+      "pairs": [
+        {
+          "pair": "dark+bright",
+          "d": 8.253824315611695,
+          "snr": 3.2042611752191537
+        },
+        {
+          "pair": "geometric+inharmonic",
+          "d": 1.2658120461882219,
+          "snr": 0.4914076480951899
+        },
+        {
+          "pair": "hollow+formant",
+          "d": 5.365370496848001,
+          "snr": 2.0829191071099555
+        },
+        {
+          "pair": "bright+formant",
+          "d": 2.3549229595889223,
+          "snr": 0.9142172066554031
+        },
+        {
+          "pair": "geometric+geometric",
+          "d": 0,
+          "snr": 0
+        }
+      ]
+    },
+    {
+      "feature": "dbFund",
+      "pairs": [
+        {
+          "pair": "dark+bright",
+          "d": 7.515750621997485,
+          "snr": 4.555050890455073
+        },
+        {
+          "pair": "geometric+inharmonic",
+          "d": 0.8338251464686698,
+          "snr": 0.5053541777702715
+        },
+        {
+          "pair": "hollow+formant",
+          "d": 5.882590745100446,
+          "snr": 3.5652460491738656
+        },
+        {
+          "pair": "bright+formant",
+          "d": 2.7597615781862617,
+          "snr": 1.6726013230625303
+        },
+        {
+          "pair": "geometric+geometric",
+          "d": 0,
+          "snr": 0
+        }
+      ]
+    },
+    {
+      "feature": "shape",
+      "pairs": [
+        {
+          "pair": "dark+bright",
+          "d": 5.60113815989588,
+          "snr": 4.6509315956490225
+        },
+        {
+          "pair": "geometric+inharmonic",
+          "d": 0.6775461226656037,
+          "snr": 0.5626036315221908
+        },
+        {
+          "pair": "hollow+formant",
+          "d": 4.04446945626559,
+          "snr": 3.358344365876653
+        },
+        {
+          "pair": "bright+formant",
+          "d": 2.2250330291401768,
+          "snr": 1.8475667125452708
+        },
+        {
+          "pair": "geometric+geometric",
+          "d": 0,
+          "snr": 0
+        }
+      ]
+    },
+    {
+      "feature": "inharmB",
+      "pairs": [
+        {
+          "pair": "dark+bright",
+          "d": 0.393838681037818,
+          "snr": 0.4627561422272261
+        },
+        {
+          "pair": "geometric+inharmonic",
+          "d": 2.429414148580889,
+          "snr": 2.854535050511152
+        },
+        {
+          "pair": "hollow+formant",
+          "d": 0.06626149264905734,
+          "snr": 0.07785652906335805
+        },
+        {
+          "pair": "bright+formant",
+          "d": 0.06409595034000296,
+          "snr": 0.0753120405379366
+        },
+        {
+          "pair": "geometric+geometric",
+          "d": 0,
+          "snr": 0
+        }
+      ]
+    },
+    {
+      "feature": "shapeB",
+      "pairs": [
+        {
+          "pair": "dark+bright",
+          "d": 5.622754372786295,
+          "snr": 3.427920308577819
+        },
+        {
+          "pair": "geometric+inharmonic",
+          "d": 2.548567213413467,
+          "snr": 1.553737675420887
+        },
+        {
+          "pair": "hollow+formant",
+          "d": 4.045335206184578,
+          "snr": 2.4662444398070464
+        },
+        {
+          "pair": "bright+formant",
+          "d": 2.2265422889586257,
+          "snr": 1.3574147160275931
+        },
+        {
+          "pair": "geometric+geometric",
+          "d": 0,
+          "snr": 0
+        }
+      ]
+    },
+    {
+      "feature": "logPB",
+      "pairs": [
+        {
+          "pair": "dark+bright",
+          "d": 8.268872314124934,
+          "snr": 2.896819989843396
+        },
+        {
+          "pair": "geometric+inharmonic",
+          "d": 2.771039357105642,
+          "snr": 0.9707735102638245
+        },
+        {
+          "pair": "hollow+formant",
+          "d": 5.365992652551068,
+          "snr": 1.879859089698342
+        },
+        {
+          "pair": "bright+formant",
+          "d": 2.3564092673375763,
+          "snr": 0.8255168553292751
+        },
+        {
+          "pair": "geometric+geometric",
+          "d": 0,
+          "snr": 0
+        }
+      ]
+    },
+    {
+      "feature": "logPattr",
+      "pairs": [
+        {
+          "pair": "dark+bright",
+          "d": 8.253824315611695,
+          "snr": 3.304083299964289
+        },
+        {
+          "pair": "geometric+inharmonic",
+          "d": 1.2658120461882219,
+          "snr": 0.5067164362577268
+        },
+        {
+          "pair": "hollow+formant",
+          "d": 5.365370496848001,
+          "snr": 2.1478081406731246
+        },
+        {
+          "pair": "bright+formant",
+          "d": 2.3549229595889223,
+          "snr": 0.9426977514851057
+        },
+        {
+          "pair": "geometric+geometric",
+          "d": 0,
+          "snr": 0
+        }
+      ]
+    },
+    {
+      "feature": "logP6",
+      "pairs": [
+        {
+          "pair": "dark+bright",
+          "d": 4.368492128957248,
+          "snr": 2.5709346011940313
+        },
+        {
+          "pair": "geometric+inharmonic",
+          "d": 0.4678798117143422,
+          "snr": 0.27535551435769173
+        },
+        {
+          "pair": "hollow+formant",
+          "d": 5.0479393575627,
+          "snr": 2.970801268717159
+        },
+        {
+          "pair": "bright+formant",
+          "d": 1.7776988625178476,
+          "snr": 1.0462071079068969
+        },
+        {
+          "pair": "geometric+geometric",
+          "d": 0,
+          "snr": 0
+        }
+      ]
+    },
+    {
+      "feature": "all",
+      "pairs": [
+        {
+          "pair": "dark+bright",
+          "d": 9.989126192701798,
+          "snr": 3.2018586414131542
+        },
+        {
+          "pair": "geometric+inharmonic",
+          "d": 2.869073568053989,
+          "snr": 0.919636795001692
+        },
+        {
+          "pair": "hollow+formant",
+          "d": 6.725110513979756,
+          "snr": 2.155629311138021
+        },
+        {
+          "pair": "bright+formant",
+          "d": 3.257676306337264,
+          "snr": 1.0441973433065266
+        },
+        {
+          "pair": "geometric+geometric",
+          "d": 0,
+          "snr": 0
+        }
+      ]
+    }
+  ]
+}

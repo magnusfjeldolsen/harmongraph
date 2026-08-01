@@ -12,6 +12,7 @@ import {t2x,x2t,drawWave,zoomBy} from './ui/waveform.js';
 import {renderResult} from './ui/panels.js';
 import {startPlay} from './audio.js';
 import {detectA4,analyze} from './analysis.js';
+import './ui/info.js';                 // wires the "i" marks; module scripts are deferred, so the DOM is ready
 
 /* ---------------- pointer: select + pinch zoom ---------------- */
 const ptrs=new Map();

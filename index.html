@@ -34,7 +34,7 @@
       <input type="file" id="file" accept="audio/*,.wav,.mp3,.m4a,.aac,.ogg,.flac,.opus">
     </div>
     <div class="row" style="margin-top:10px">
-      <button id="recBtn" class="rec grow">● Record from mic</button>
+      <button id="recBtn" class="rec grow">● Record from mic</button><button class="info" data-info="record"></button>
       <button id="demoBtn" class="grow">Load test chord</button>
     </div>
   </div>
@@ -43,7 +43,7 @@
 <!-- ============ WAVEFORM ============ -->
 <section class="panel" id="wavePanel" style="display:none">
   <div class="panel-hd">
-    <span class="eyebrow">Waveform</span>
+    <span class="eyebrow">Waveform<button class="info" data-info="fence"></button></span>
     <span class="eyebrow">drag = select · pinch = zoom</span>
   </div>
   <div class="wavewrap">
@@ -89,19 +89,19 @@
           <option value="32768">32768 — sharp, needs ≥1.5 s</option>
         </select>
       </label>
-      <label class="field">Note threshold <span class="num" id="thrTxt">0.12</span>
+      <label class="field">Note threshold<button class="info" data-info="threshold"></button> <span class="num" id="thrTxt">0.12</span>
         <input type="range" id="thr" min="0.03" max="0.4" step="0.01" value="0.12">
       </label>
     </div>
-    <label class="field" style="margin-bottom:10px">Timbre — pure ↔ bright <span class="num" id="decTxt">0.72</span>
+    <label class="field" style="margin-bottom:10px">Timbre — pure ↔ bright<button class="info" data-info="timbre"></button> <span class="num" id="decTxt">0.72</span>
       <input type="range" id="decay" min="0.60" max="0.86" step="0.01" value="0.72">
     </label>
-    <label class="field" style="margin-bottom:6px">Fundamental — weak ↔ strong <span class="num" id="fundTxt">1.00</span>
+    <label class="field" style="margin-bottom:6px">Fundamental — weak ↔ strong<button class="info" data-info="fund"></button> <span class="num" id="fundTxt">1.00</span>
       <input type="range" id="fund" min="0.45" max="1.00" step="0.05" value="1.00">
     </label>
     <div class="hint" style="margin-bottom:10px">Move this <b>left</b> if a note is being reported an octave too high. It tells the fit your instrument's fundamental is quieter than its overtones, which is true of most guitars, small speakers and phone mics — and an octave-up reading is what happens when the fit does not believe that.</div>
     <div class="row" style="margin-bottom:10px">
-      <button id="hpssBtn" class="on grow">Strip percussion (HPSS)</button>
+      <button id="hpssBtn" class="on grow">Strip percussion (HPSS)</button><button class="info" data-info="hpss"></button>
       <button id="analyzeBtn" class="pri grow">Analyze selection</button>
     </div>
     <div class="hint">Fence a segment where <b>one chord</b> is sustained. Short and clean beats long and busy.</div>
@@ -123,15 +123,15 @@
   </div>
 
   <div class="panel-hd" style="border-top:1px solid var(--line)">
-    <span class="eyebrow">Voicing</span>
+    <span class="eyebrow">Voicing<button class="info" data-info="tapnote"></button></span>
     <span class="seg" style="margin-left:auto">
       <button id="pickAll" class="on">All detected</button><button id="pickMine">My picks</button>
-    </span>
+    </span><button class="info" data-info="picks"></button>
   </div>
   <div class="panel-bd" style="padding:8px 12px">
     <div class="hint" id="pickHint" style="margin-bottom:8px">Tap a note name to hear it alone. Tick notes to build your own version, then switch to <b>My picks</b>.</div>
     <table id="noteTbl">
-      <thead><tr><th>Note</th><th>Hz</th><th style="width:26%">Level</th><th style="width:22%">Real</th><th style="width:34px"></th></tr></thead>
+      <thead><tr><th>Note</th><th>Hz</th><th style="width:26%">Level</th><th style="width:22%">Real<button class="info" data-info="real"></button></th><th style="width:34px"></th></tr></thead>
       <tbody></tbody>
     </table>
   </div>
@@ -142,7 +142,7 @@
   </div>
   <canvas id="spec"></canvas>
 
-  <div class="panel-hd" style="border-top:1px solid var(--line)"><span class="eyebrow">Listen to a layer</span></div>
+  <div class="panel-hd" style="border-top:1px solid var(--line)"><span class="eyebrow">Listen to a layer<button class="info" data-info="layers"></button></span></div>
   <div class="panel-bd">
     <div class="grid2" style="margin-bottom:8px">
       <button data-iso="full" class="iso on">Everything</button>
@@ -154,7 +154,7 @@
   </div>
 
   <div class="panel-hd" style="border-top:1px solid var(--line)">
-    <span class="eyebrow">Hear the chord back</span><span class="eyebrow" id="synthInfo">—</span>
+    <span class="eyebrow">Hear the chord back<button class="info" data-info="playback"></button></span><span class="eyebrow" id="synthInfo">—</span>
   </div>
   <div class="panel-bd">
     <div class="grid2" style="margin-bottom:8px">

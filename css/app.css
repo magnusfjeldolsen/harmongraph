@@ -177,6 +177,53 @@ td.n.tap:focus-visible{outline:1px solid var(--cy);outline-offset:-1px;border-ra
 }
 input[type=checkbox]{accent-color:var(--cy);width:17px;height:17px}
 
+/* ---------- info marks and popover ---------- */
+button.info{
+  all:unset;
+  display:inline-flex;align-items:center;justify-content:center;
+  width:16px;height:16px;min-width:16px;border-radius:99px;
+  border:1px solid var(--line2);color:var(--dimmer);
+  font-family:var(--mono);font-size:10px;font-style:italic;line-height:1;
+  cursor:pointer;vertical-align:middle;margin-left:6px;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+  transition:color .12s,border-color .12s;
+}
+button.info::before{content:'i'}
+button.info:hover,button.info[aria-expanded=true]{color:var(--cy);border-color:var(--cy)}
+button.info:focus-visible{outline:2px solid var(--cy);outline-offset:2px}
+
+.pop{
+  position:fixed;z-index:60;display:none;
+  background:var(--panel);border:1px solid var(--line2);border-radius:var(--r);
+  box-shadow:0 12px 34px rgba(0,0,0,.6);
+  overflow:hidden;
+}
+.pop.show{display:flex;flex-direction:column}
+/* the header never scrolls away, so the close button is always reachable */
+.pop-hd{
+  display:flex;align-items:center;gap:10px;flex:0 0 auto;
+  padding:9px 10px 9px 12px;border-bottom:1px solid var(--line);
+  background:var(--panel2);
+}
+.pop-t{
+  font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--cy);flex:1;
+}
+.pop-x{
+  all:unset;flex:0 0 auto;cursor:pointer;
+  width:26px;height:26px;border-radius:var(--r);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--dim);font-size:13px;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+}
+.pop-x:hover{color:#fff;background:#22333c}
+.pop-x:focus-visible{outline:2px solid var(--cy);outline-offset:-2px}
+.pop-b{padding:11px 12px 13px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.pop-b p{margin:0 0 9px;font-size:12.5px;line-height:1.5;color:var(--dim)}
+.pop-b p:last-child{margin-bottom:0}
+.pop-b b{color:var(--ink);font-weight:600}
+.pop-b i{font-style:italic}
+
 /* ---------- status ---------- */
 #status{
   font-family:var(--mono);font-size:11.5px;color:var(--dim);

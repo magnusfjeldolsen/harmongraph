@@ -514,3 +514,67 @@ building it, check on a handful of real stereo files whether the instruments in
 the material this tool is used on are actually panned apart. If they are not,
 recommendation 3 drops off the list and the honest answer is recommendations 1,
 2, 4 and nothing else.
+
+---
+
+## 8. SVD — asked about separately, and it answers the question exactly
+
+SVD is the natural thing to reach for, and it is worth being precise about why
+it does not work here, because its *failure mode is itself the measurement* the
+rest of this document argues for.
+
+Singular values of the magnitude spectrogram say how many independent things
+**vary over time** in the matrix. Sampled across the two-instrument corpus and
+the solo corpus, 2.5 s windows, 2048-point STFT:
+
+```
+kind              frames   s2/s1   energy in the 1st component
+two instruments    212     0.128           91.8 – 97.9 %
+one instrument     212     0.120           93.1 – 98.4 %
+```
+
+**Between 92% and 98% of the energy sits in the first component in every single
+case**, and `s2/s1` is 0.120 for one instrument against 0.128 for two — the two
+populations are indistinguishable, exactly as the silhouette was in §4.
+
+That is not a defect of SVD. It is SVD correctly reporting that a sustained
+chord is a rank-1 object: every column of the spectrogram is nearly the same
+spectrum, so there is one thing there, however many instruments are playing it.
+It is the cleanest available statement of §2's identifiability argument.
+
+Two further problems would remain even if the matrix were not rank-1:
+
+- **Components are signed.** A magnitude spectrogram is non-negative; an SVD
+  component with negative entries is not a sound and cannot be listened to.
+  This is the reason NMF displaced PCA/SVD for audio in the first place
+  (Lee & Seung 1999; Smaragdis & Brown 2003).
+- **Orthogonality is the wrong constraint.** SVD forces components to be
+  mutually orthogonal. Instruments playing a chord are emphatically *not*
+  orthogonal — they share partials by design, which is what harmony is. The
+  components are therefore not sources.
+
+**Where SVD does work in audio**, for contrast: RPCA (Huang et al. 2012)
+separates singing voice by splitting the spectrogram into a low-rank part
+(accompaniment, which repeats) and a sparse part (voice, which does not). It
+uses iterated SVD and it works — because it exploits *repetition over tens of
+seconds*. Nothing repeats inside a two-second chord.
+
+### The one genuinely useful thing to do with this
+
+`s2/s1` is ~15 lines of Jacobi iteration over a small Gram matrix and costs
+nothing. It cannot separate anything, but it *can* tell the user their fence
+contains nothing separable — and that is honest information the app currently
+has no way to give:
+
+> This selection is one sustained texture. To pull it apart, include the moment
+> the notes start.
+
+It is the same conclusion as §2's measurement that onset and decay contrast is
+worth +0.208 where duration alone is worth +0.011, expressed as something a user
+can act on.
+
+*(Caveat: the corpus is synthetic sustained tones, so near-rank-1 is partly by
+construction. Real sustained chords have vibrato, beating and decay that raise
+the tail — but the §2 duration result, measured on the same corpus, points the
+same way, and no amount of tail lifts `s2/s1` from 0.12 to the ~1.0 that genuine
+two-source separability would need.)*

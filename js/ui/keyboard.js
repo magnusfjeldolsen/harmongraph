@@ -1,7 +1,15 @@
 /* ---------------- 88-key drawing ---------------- */
 import {KD,kctx,dynColor} from './canvas.js';
+import {sel} from '../state.js';
 
 const WHITE=[0,2,4,5,7,9,11];
+/* x span of a key, so the selection marker and the drag readout can sit over
+   the right one without every caller re-deriving the geometry */
+function keyX(g,midi,bw){
+  const isW=WHITE.includes(midi%12);
+  return isW ? {x:g.xOf[midi], w:g.ww}
+             : {x:g.xOf[midi-1]+g.ww-bw/2, w:bw};
+}
 function keyGeom(w){
   // A0(21) .. C8(108)
   let whites=[]; for(let m=21;m<=108;m++) if(WHITE.includes(m%12)) whites.push(m);
@@ -45,12 +53,32 @@ function drawKeys(rows){
   }
   // confidence ticks under each hit
   rows.forEach(r=>{
-    const isW=WHITE.includes(r.midi%12);
-    const x= isW? g.xOf[r.midi] : g.xOf[r.midi-1]+g.ww-bw/2;
-    const wdt= isW? g.ww : bw;
+    const {x,w:wdt}=keyX(g,r.midi,bw);
     kctx.fillStyle='#9184f0';
     kctx.fillRect(x+1,h-3,Math.max(1,(wdt-2)*r.pf),3);
   });
+
+  // where a moved note came from: a hollow marker on the detected key, and a
+  // line to where it is now, so the edit is visible rather than just done
+  rows.forEach(r=>{
+    if(r.dmidi==null||r.dmidi===r.midi) return;
+    const a=keyX(g,r.dmidi,bw), b=keyX(g,r.midi,bw);
+    kctx.strokeStyle='#5d727e'; kctx.lineWidth=1;
+    kctx.setLineDash([2,2]);
+    kctx.strokeRect(a.x+1.5,1,a.w-3,h*0.5);
+    kctx.setLineDash([]);
+    kctx.beginPath();
+    kctx.moveTo(a.x+a.w/2,h*0.5); kctx.lineTo(b.x+b.w/2,h*0.62);
+    kctx.stroke();
+  });
+
+  // the note being edited
+  const s=rows.find(r=>r.i===sel.i);
+  if(s){
+    const {x,w:wdt}=keyX(g,s.midi,bw);
+    kctx.strokeStyle='#5ad1e6'; kctx.lineWidth=2;
+    kctx.strokeRect(x+1,1,wdt-2,h-2);
+  }
 }
 
 export {drawKeys};

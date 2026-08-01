@@ -124,16 +124,31 @@
 
   <div class="panel-hd" style="border-top:1px solid var(--line)">
     <span class="eyebrow">Voicing<button class="info" data-info="tapnote"></button></span>
-    <span class="seg" style="margin-left:auto">
-      <button id="pickAll" class="on">All detected</button><button id="pickMine">My picks</button>
-    </span><button class="info" data-info="picks"></button>
+    <span class="eyebrow">tap a name to select &amp; hear</span>
   </div>
   <div class="panel-bd" style="padding:8px 12px">
-    <div class="hint" id="pickHint" style="margin-bottom:8px">Tap a note name to hear it alone. Tick notes to build your own version, then switch to <b>My picks</b>.</div>
     <table id="noteTbl">
       <thead><tr><th>Note</th><th>Hz</th><th style="width:26%">Level</th><th style="width:22%">Real<button class="info" data-info="real"></button></th><th style="width:34px"></th></tr></thead>
       <tbody></tbody>
     </table>
+
+    <div id="selBar" class="selbar" style="display:none">
+      <span class="selbar-t">editing <span id="selName">—</span></span>
+      <span class="nudge">
+        <button data-mv="-12">-8ve</button><button data-mv="-7">-5th</button
+        ><button data-mv="-1">-1</button><button data-mv="1">+1</button
+        ><button data-mv="7">+5th</button><button data-mv="12">+8ve</button>
+      </span>
+      <button id="selUndo" class="mini">↺ this note</button>
+      <div class="hint" style="margin:6px 0 0">Or drag left/right on the keyboard above.</div>
+    </div>
+
+    <div class="row" style="margin-top:10px;align-items:center">
+      <span class="seg">
+        <button id="pickAll" class="on">Detected</button><button id="pickMine">My picks</button>
+      </span><button class="info" data-info="picks"></button>
+      <button id="resetAll" class="mini" style="margin-left:auto;display:none">↺ Reset all</button>
+    </div>
   </div>
 
   <div class="panel-hd" style="border-top:1px solid var(--line)">

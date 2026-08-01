@@ -27,4 +27,4 @@ function dynColor(db,alpha){
   return `hsla(${h.toFixed(0)},82%,${(46+8*t).toFixed(0)}%,${alpha})`;
 }
 
-export {wave,wctx,kctx,sctx,WD,KD,SD,fitCanvas,dynColor};
+export {wave,keys,wctx,kctx,sctx,WD,KD,SD,fitCanvas,dynColor};

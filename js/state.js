@@ -36,6 +36,17 @@ let noteOn=new Set();
    means "no opinion", and the default applies. Cleared on a new analysis. */
 let noteVote=new Map();
 
+/* how far the user moved a note, index -> semitones. The detected result in
+   S.rows is never rewritten — it stays the algorithm's answer, so Detected
+   and Your version are always both available and Reset is just a delete. */
+let noteShift=new Map();
+
+/* the note currently being edited, index or null. Set by tapping a name;
+   the key-map drag moves whichever note this points at, which is what lets
+   dragging work at all — at 4 px per key there is no way to grab a note
+   directly, but there is no need to once you have already said which one. */
+let sel={i:null};
+
 function ac(){
   if(!S.ac) S.ac=new (window.AudioContext||window.webkitAudioContext)();
   if(S.ac.state==='suspended') S.ac.resume();
@@ -79,4 +90,5 @@ function setStatus(t,busy,err){
   el.innerHTML=(busy?'<span class="spin"></span>':'')+t;
 }
 
-export {$,clamp,fmtT,yield_,S,noteOn,noteVote,ac,acReady,audioSession,isIOS,setStatus};
+export {$,clamp,fmtT,yield_,S,noteOn,noteVote,noteShift,sel,
+        ac,acReady,audioSession,isIOS,setStatus};

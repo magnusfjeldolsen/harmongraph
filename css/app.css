@@ -177,6 +177,35 @@ td.n.tap:focus-visible{outline:1px solid var(--cy);outline-offset:-1px;border-ra
 }
 input[type=checkbox]{accent-color:var(--cy);width:17px;height:17px}
 
+/* ---------- note editing ---------- */
+tr.selrow td{background:#132029}
+tr.selrow td.n{box-shadow:inset 2px 0 0 var(--cy)}
+.was{color:var(--dimmer);text-decoration:line-through;font-weight:400}
+
+.selbar{
+  margin-top:9px;padding:9px 10px;border:1px solid var(--line2);
+  border-radius:var(--r);background:var(--panel2);
+}
+.selbar-t{
+  display:block;margin-bottom:7px;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--dimmer);
+}
+.selbar-t b{color:var(--ink);font-size:13px;letter-spacing:0}
+.nudge{display:flex;width:100%}
+.nudge button{
+  flex:1;min-width:0;padding:8px 2px;border-radius:0;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.02em;
+}
+.nudge button:first-child{border-radius:var(--r) 0 0 var(--r)}
+.nudge button:last-child{border-radius:0 var(--r) var(--r) 0}
+.nudge button+button{border-left-width:0}
+#selUndo{margin-top:7px}
+/* the key map takes horizontal drag to retune the selected note; vertical
+   stays with the page, the same contract the waveform deliberately does not
+   use — see docs/interaction-design.md §2 */
+#keys{touch-action:pan-y;-webkit-tap-highlight-color:transparent}
+
 /* ---------- info marks and popover ---------- */
 button.info{
   all:unset;

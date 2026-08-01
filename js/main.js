@@ -6,13 +6,65 @@
    The Source, transport and playback panels wire themselves in
    audio.js, next to the code they drive.
    ============================================================ */
-import {$,S,clamp} from './state.js';
-import {wave,WD,fitCanvas} from './ui/canvas.js';
+import {$,S,clamp,sel,noteShift} from './state.js';
+import {wave,keys,WD,KD,fitCanvas} from './ui/canvas.js';
 import {t2x,x2t,drawWave,zoomBy} from './ui/waveform.js';
 import {renderResult} from './ui/panels.js';
 import {startPlay} from './audio.js';
 import {detectA4,analyze} from './analysis.js';
 import './ui/info.js';                 // wires the "i" marks; module scripts are deferred, so the DOM is ready
+import {moveNote,resetNote,resetAll,previewNote} from './audio.js';
+import {refreshSel} from './ui/panels.js';
+
+/* ---------------- editing a detected note ----------------
+   Tapping a name in the table selects a note and sounds it; this moves it.
+
+   The drag is RELATIVE, not a hit test. At 360 px the key map gives ~4 px per
+   key, so grabbing a note directly is impossible — but nothing needs grabbing
+   once the tap has already said which note is being edited. Dragging then
+   just counts semitones from where the finger went down, snapped, with the
+   new pitch shown live, so precision stops mattering: overshoot and come
+   back before letting go. */
+const nudge=document.querySelector('.nudge');
+if(nudge) nudge.onclick=e=>{
+  const b=e.target.closest('[data-mv]'); if(!b||sel.i==null) return;
+  moveNote(sel.i,+b.dataset.mv); refreshSel(); soundSel();
+};
+$('#selUndo').onclick=()=>{ if(sel.i!=null){ resetNote(sel.i); refreshSel(); soundSel(); } };
+$('#resetAll').onclick=()=>{ resetAll(); refreshSel(); };
+function soundSel(){
+  const r=(S.rows||[]).find(x=>x.i===sel.i);
+  if(r) previewNote(r);                // hear the result of the edit immediately
+}
+
+let kdrag=null;
+keys.addEventListener('pointerdown',e=>{
+  if(sel.i==null||!S.rows) return;
+  const r=S.rows.find(x=>x.i===sel.i); if(!r) return;
+  kdrag={x0:e.clientX, base:noteShift.get(sel.i)||0, last:0, moved:false};
+  keys.setPointerCapture(e.pointerId);
+});
+keys.addEventListener('pointermove',e=>{
+  if(!kdrag) return;
+  const dx=e.clientX-kdrag.x0;
+  if(!kdrag.moved && Math.abs(dx)<6) return;   // let a tap stay a tap
+  kdrag.moved=true;
+  e.preventDefault();
+  // one semitone per white-key width, so the drag tracks the picture beneath it
+  const per=Math.max(6,(KD.w||334)/52);
+  const semis=Math.round(dx/per);
+  if(semis===kdrag.last) return;
+  kdrag.last=semis;
+  moveNote(sel.i,kdrag.base+semis,true);
+  refreshSel();
+});
+function endKeyDrag(){
+  if(!kdrag) return;
+  const moved=kdrag.moved; kdrag=null;
+  if(moved) soundSel();                        // sound it once, on release
+}
+keys.addEventListener('pointerup',endKeyDrag);
+keys.addEventListener('pointercancel',endKeyDrag);
 
 /* ---------------- pointer: select + pinch zoom ---------------- */
 const ptrs=new Map();

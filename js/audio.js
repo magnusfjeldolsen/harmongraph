@@ -5,8 +5,9 @@
    Owns the controls of the Source, Waveform-transport, Listen and
    Hear-the-chord-back panels.
    ============================================================ */
-import {$,S,clamp,ac,acReady,audioSession,isIOS,setStatus,yield_,noteOn,noteVote} from './state.js';
-import {midiFreq} from './pitch.js';
+import {$,S,clamp,ac,acReady,audioSession,isIOS,setStatus,yield_,
+        noteOn,noteVote,noteShift,sel} from './state.js';
+import {midiFreq,midiName} from './pitch.js';
 import {NOTE_LO} from './dsp/nnls.js';
 import {stft,istft} from './dsp/fft.js';
 import {applyMask} from './dsp/hpss.js';
@@ -271,10 +272,13 @@ async function buildIso(kind){
     const keep=new Float32Array(K);
     // same set the chord plays, so the layer and the resynthesis never
     // disagree about what "the chord" currently means
-    const list=activeRows().map(r=>r.i);
+    // the pitches that actually sound, so a moved note is cut from the
+    // recording at the pitch you moved it to — which is the honest test of
+    // whether the move was right
+    const list=activeRows().map(r=>r.midi);
     if(!list.length){ setStatus('Tick at least one note to solo it.',false,true); return; }
-    list.forEach(i=>{
-      const f0=midiFreq(NOTE_LO+i,S.a4);
+    list.forEach(m=>{
+      const f0=midiFreq(m,S.a4);
       for(let hh=1;hh<=16;hh++){
         const f=f0*hh; if(f>S.sr/2) break;
         const wid=f*(Math.pow(2,50/1200)-1);          // ±50 cents soft
@@ -424,11 +428,21 @@ function renderNote(midi,vel,voice){
   return e;
 }
 /* What "the chord" means for playback and for the harmonic-comb isolation.
-   In All-detected mode the ticks are ignored but kept, so switching back to
-   My picks restores them untouched. */
+   In Detected mode every edit is ignored but none is discarded, so switching
+   back to Your version restores the ticks and the moves untouched.
+   `midi` and `name` come back as the pitch that should actually sound, so
+   callers never need to know an edit happened; `dmidi` keeps the detected
+   pitch for anything that wants to show the difference. */
+function shiftOf(i){ return S.playAll ? 0 : (noteShift.get(i)||0); }
 function activeRows(){
   const rows=S.rows||[];
-  return S.playAll ? rows.slice() : rows.filter(r=>noteOn.has(r.i));
+  const keep=S.playAll ? rows : rows.filter(r=>noteOn.has(r.i));
+  return keep.map(r=>{
+    const s=shiftOf(r.i);
+    if(!s) return {...r, dmidi:r.midi};
+    const m=clamp(r.midi+s,21,108);
+    return {...r, midi:m, dmidi:r.midi, name:midiName(m), f:midiFreq(m,S.a4)};
+  });
 }
 const noteAmp=r=>Math.pow(10,(S.useDyn?Math.max(r.db,-30):-6)/20);
 const noteVel=r=>S.useDyn?clamp((r.db+42)/42,0.12,1):0.7;
@@ -572,9 +586,13 @@ async function playSynth(kind){
    you can already read its level off the bar. The status line states the
    measured figure instead, so nothing is hidden. */
 let previewSrc=null, previewSeq=0;
-async function previewNote(row){
+async function previewNote(row0){
   stopPlay(); stopSynth();
   if(previewSrc){ try{ previewSrc.stop(); }catch(e){} previewSrc=null; }
+  // hear where the note is now, not where it was detected
+  const sh=shiftOf(row0.i);
+  const pm=sh?clamp(row0.midi+sh,21,108):row0.midi;
+  const row=sh?{...row0,midi:pm,name:midiName(pm),f:midiFreq(pm,S.a4)}:row0;
   const seq=++previewSeq;
   const c=await acReady();
   if(seq!==previewSeq) return;
@@ -593,6 +611,25 @@ async function previewNote(row){
    reads noteOn. Only a change that invalidates the rendered notes or the
    bus does, which is the voice and the dynamics mode. */
 function restartSynth(){ if(synthKind){ const k=synthKind; synthKind=null; playSynth(k); } }
+/* Moving a note. S.rows is never rewritten — the shift lives beside it, so
+   Detected stays available and Reset is a delete rather than a recompute.
+   Nothing re-renders and nothing restarts: the scheduler re-reads the set at
+   the top of the next cycle, so a correction lands on the next A/B pass. */
+function moveNote(i,semis,absolute){
+  const row=(S.rows||[]).find(r=>r.i===i); if(!row) return 0;
+  const cur=noteShift.get(i)||0;
+  let s=absolute?semis:cur+semis;
+  s=clamp(row.midi+s,21,108)-row.midi;           // never leave the keyboard
+  if(s) noteShift.set(i,s); else noteShift.delete(i);
+  if(S.playAll) setPickMode(false);              // an edit means you want your version
+  else { delete S.isoBufs.notes; if(S.iso==='notes') buildIso('notes'); }
+  return s;
+}
+function resetNote(i){ noteShift.delete(i); noteVote.delete(i); delete S.isoBufs.notes; }
+function resetAll(){
+  noteShift.clear(); noteVote.clear(); sel.i=null;
+  delete S.isoBufs.notes;
+}
 /* All detected vs My picks. Switching only changes which set counts — the
    ticks are never rewritten, so you can flip back and forth freely. The
    isolation layer is rebuilt because it is cut from the same set. */
@@ -627,4 +664,5 @@ document.querySelectorAll('.voice').forEach(b=>{
   };
 });
 
-export {startPlay,buildIso,renderNote,activeRows,noteVel,previewNote,setPickMode};
+export {startPlay,buildIso,renderNote,activeRows,noteVel,previewNote,setPickMode,
+        moveNote,resetNote,resetAll,shiftOf};

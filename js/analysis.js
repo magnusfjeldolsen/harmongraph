@@ -1,10 +1,14 @@
 /* ============================================================
-   MAIN ANALYSIS — the pipeline that runs on the fenced selection,
-   plus the concert-pitch estimator that shares its slicing.
+   MAIN ANALYSIS — the glue between the fenced selection and the
+   DSP, which now runs in a worker (js/analysisRunner.js decides
+   whether that is a real worker or the main-thread fallback).
+
+   Nothing here computes anything. It slices the selection, hands
+   the signal over, turns the worker's stage messages into the
+   status line, and hands the result to the renderer.
    ============================================================ */
-import {$,S,clamp,setStatus,yield_,noteOn,noteVote} from './state.js';
-import {stft,magOf} from './dsp/fft.js';
-import {analyzeSegment} from './analyzeSegment.js';
+import {$,S,setStatus,noteOn,noteVote} from './state.js';
+import {runAnalysis,runDetectA4,cancelRun,isAborted} from './analysisRunner.js';
 import {renderResult} from './ui/panels.js';
 
 /* ---------------- selection slice ---------------- */
@@ -15,53 +19,71 @@ function slice(maxSec){
   return S.mono.subarray(a,b);
 }
 
+/* ---------------- what is in flight ----------------
+   One slot, because the runner has one slot: starting either job cancels
+   whatever was running. The token is an object rather than a flag so a run
+   that has already been superseded cannot clear the state of the run that
+   superseded it. */
+let job=null;
+function setJob(t){
+  job=t;
+  const b=$('#analyzeBtn');
+  const running = t && t.kind==='analyze';
+  // the same affordance the transport uses: the button that started the work
+  // becomes the one that stops it, so there is no new control to explain
+  b.textContent = running ? '■ Cancel' : 'Analyze selection';
+  b.classList.toggle('pri',!running);
+  b.disabled = !!(t && t.kind==='a4');
+  $('#detectA4').disabled = !!t;
+}
+const done = t => { if(job===t) setJob(null); };
+
 /* ---------------- A4 detection ---------------- */
 async function detectA4(){
-  if(!S.mono){ return; }
-  setStatus('Estimating concert pitch …',true); await yield_();
-  const sig=slice(6), n=Math.min(S.fftN,1<<Math.floor(Math.log2(Math.max(4096,sig.length))));
-  const S1=stft(sig,n,n/2), M=magOf(S1);
-  const K=S1.K, avg=new Float32Array(K);
-  for(let t=0;t<S1.frames;t++) for(let k=0;k<K;k++) avg[k]+=M[t*K+k];
-  for(let k=0;k<K;k++) avg[k]/=S1.frames;
-  const df=S.sr/n;
-  let mx=0; for(let k=0;k<K;k++) if(avg[k]>mx) mx=avg[k];
-  let cx=0, cy=0;
-  for(let k=2;k<K-2;k++){
-    if(avg[k]<=avg[k-1]||avg[k]<avg[k+1]||avg[k]<0.03*mx) continue;
-    const d=0.5*(avg[k-1]-avg[k+1])/(avg[k-1]-2*avg[k]+avg[k+1]||1e-9);
-    const f=(k+clamp(d,-.5,.5))*df;
-    if(f<55||f>2200) continue;
-    const cents=1200*Math.log2(f/440);
-    const dev=cents-100*Math.round(cents/100);
-    const w=avg[k];
-    cx+=w*Math.cos(2*Math.PI*dev/100); cy+=w*Math.sin(2*Math.PI*dev/100);
-  }
-  if(cx===0&&cy===0){ setStatus('Not enough tonal content to estimate pitch.',false,true); return; }
-  let dev=Math.atan2(cy,cx)/(2*Math.PI)*100;
-  const a4=clamp(440*Math.pow(2,dev/1200),415,466);
-  S.a4=a4; $('#a4').value=a4.toFixed(1); S.ana=null;
-  setStatus('Concert pitch ≈ <b style="color:var(--cy)">'+a4.toFixed(1)+' Hz</b> ('+(dev>=0?'+':'')+dev.toFixed(0)+' cents from 440).');
+  if(!S.mono) return;
+  const t={kind:'a4'}; setJob(t);
+  setStatus('Estimating concert pitch …',true);
+  try{
+    const R=await runDetectA4(Float32Array.from(slice(6)),S.sr,S.fftN);
+    if(!R.est){ setStatus('Not enough tonal content to estimate pitch.',false,true); return; }
+    const {a4,dev}=R.est;
+    S.a4=a4; $('#a4').value=a4.toFixed(1); S.ana=null;
+    setStatus('Concert pitch ≈ <b style="color:var(--cy)">'+a4.toFixed(1)+' Hz</b> ('+(dev>=0?'+':'')+dev.toFixed(0)+' cents from 440).');
+  }catch(err){
+    if(isAborted(err)) return;                 // superseded; whoever superseded it owns the status
+    console.error(err);
+    setStatus('Pitch detection failed: '+err.message,false,true);
+  }finally{ done(t); }
 }
 
+/* ---------------- the analysis ---------------- */
 async function analyze(){
+  // pressing the button while a run is in flight cancels it. The worker
+  // unwinds cooperatively and survives, so the next press reuses it.
+  if(job && job.kind==='analyze'){
+    cancelRun(); setJob(null);
+    setStatus('Analysis cancelled.');
+    return;
+  }
   if(!S.mono) return;
-  $('#analyzeBtn').disabled=true;
+  const t={kind:'analyze'}; setJob(t);
+  const t0=performance.now();
   try{
-    const t0=performance.now();
-    setStatus('Reading selection …',true); await yield_();
+    setStatus('Reading selection …',true);
     const sig=Float32Array.from(slice(6));
     if(sig.length<2048){ setStatus('Selection too short — fence at least ~0.2 s.',false,true); return; }
 
-    // the whole pipeline lives in analyzeSegment(); onStage keeps the status
-    // line and the event-loop yields exactly where they used to be
-    const R=await analyzeSegment(sig,S.sr,{
-      a4:S.a4, fftN:S.fftN, decay:S.decay, fund:S.fund, hpss:S.hpss,
-      thr:S.thr, gate:S.GATE, nms:S.NMS, maxNotes:12,
-      onStage: async m=>{ if(m) setStatus(m,true); await yield_(); }
-    });
+    let R;
+    try{
+      R=await run(sig);
+    }catch(err){
+      // the worker died rather than declining the job: re-cut the selection
+      // and finish on the main thread rather than losing the run
+      if(!err || !err.workerFailed) throw err;
+      R=await run(Float32Array.from(slice(6)));
+    }
 
-    S._fine={Sf:R.Sf,mask:R.mask,sigLen:sig.length,sig};
+    S._fine={Sf:R.Sf,mask:R.mask,sigLen:R.sig.length,sig:R.sig};
     const n=R.windowSize;
     S.ana={detN:R.detN,xamp:R.xamp,pfund:R.pfund,evid:R.evid,
            yraw:R.yraw,yw:R.yw,recon:R.recon,fundBin:R.fundBin,
@@ -75,11 +97,18 @@ async function analyze(){
     renderResult();
     setStatus('Done in '+S.ana.ms+' ms · window '+n+' · A₄ '+S.a4.toFixed(1)+' Hz'+(S.hpss?' · percussion stripped':''));
   }catch(err){
+    if(isAborted(err)) return;                 // cancelled or superseded
     console.error(err);
     setStatus('Analysis failed: '+err.message,false,true);
-  }finally{
-    $('#analyzeBtn').disabled=false;
-  }
+  }finally{ done(t); }
 }
+
+/* The signal is handed over, not copied — it comes back on the result, which
+   is what lets S._fine keep it without ever holding a buffer the worker has
+   detached. `m` null is a stage that only exists to yield. */
+const run = sig => runAnalysis(sig,S.sr,{
+  a4:S.a4, fftN:S.fftN, decay:S.decay, fund:S.fund, hpss:S.hpss,
+  thr:S.thr, gate:S.GATE, nms:S.NMS, maxNotes:12
+}, m=>{ if(m) setStatus(m,true); });
 
 export {detectA4,analyze};

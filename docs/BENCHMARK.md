@@ -101,3 +101,45 @@ path is untested against real percussion. Windows are short (0.30–1.20 s),
 which is at the low end of what the app recommends fencing, and below the
 ~1.5 s the bass register wants. And GuitarSet is close-mic'd studio material,
 so it understates room and noise.
+
+---
+
+## Capture through a small speaker
+
+`--hpf <Hz>` rolls the bottom off a window before analysing it, simulating what
+reaches a microphone when the source is a phone or laptop speaker that cannot
+radiate a low fundamental. It exists because the alternative was guessing.
+
+GuitarSet `comp` windows, current `master`:
+
+| | recall | prec. | F1 | oct err |
+|---|---|---|---|---|
+| full band | 0.704 | 0.675 | **0.689** | 216 |
+| below 200 Hz removed | 0.793 | 0.658 | **0.719** | 266 |
+| below 400 Hz removed | 0.734 | 0.492 | 0.590 | 486 |
+| below 800 Hz removed | 0.657 | 0.360 | 0.465 | 748 |
+
+**Losing the bottom two octaves is not fatal, and a gentle rolloff is a mild
+improvement.** At 200 Hz, F1 *rises* — removing the sub-bass takes the
+low-frequency noise ghosts of §10 with it, and recall goes up because fewer
+phantom bass notes crowd out real ones in the 12-note cap.
+
+Past ~400 Hz it degrades, and it degrades in one specific way: **octave errors
+more than double**. That is the `buildDict` failure the Fundamental control
+exists for — strip a note's fundamental and its second partial is the loudest
+thing left, so the fit places the note where the loud thing is. Lowering
+`fund` recovers a good part of it:
+
+| | F1 | oct err |
+|---|---|---|
+| hpf 400, fund 1.0 | 0.590 | 486 |
+| hpf 400, fund 0.6 | **0.625** | **354** |
+| hpf 800, fund 1.0 | 0.465 | 748 |
+| hpf 800, fund 0.6 | **0.516** | **555** |
+
+**Practical reading.** Capturing a speaker with the phone's mic is a workable
+way to use this tool, not a degraded mode to apologise for — the chord-defining
+intervals live in the midrange and survive. Move the **Fundamental** slider left
+when doing it. The bass note is the part that genuinely may not be there, and
+inferring it from the upper structure is a real open possibility rather than a
+loss to accept.

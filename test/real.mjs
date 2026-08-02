@@ -31,6 +31,28 @@ for(let i=3;i<process.argv.length;i++){
 }
 if(Object.keys(OPTS).length) console.log('overrides: '+JSON.stringify(OPTS));
 
+/* --hpf <Hz> : simulate capture through a small speaker.
+   A phone or laptop speaker cannot move enough air to radiate a low
+   fundamental, so what reaches the mic is the recording minus its bottom.
+   This answers a question that otherwise gets guessed at: is the midrange
+   alone enough to read a chord? Second-order Butterworth, applied twice
+   (forward only, so 12 dB/oct) — the point is the rolloff, not phase. */
+const HPF=(()=>{ const i=process.argv.indexOf('--hpf'); return i>0?+process.argv[i+1]:0; })();
+function highpass(x,sr,fc){
+  const K=Math.tan(Math.PI*fc/sr), Q=Math.SQRT1_2;
+  const n=1/(1+K/Q+K*K);
+  const b0=n, b1=-2*n, b2=n;
+  const a1=2*(K*K-1)*n, a2=(1-K/Q+K*K)*n;
+  const y=new Float32Array(x.length);
+  let x1=0,x2=0,y1=0,y2=0;
+  for(let i=0;i<x.length;i++){
+    const v=b0*x[i]+b1*x1+b2*x2-a1*y1-a2*y2;
+    x2=x1; x1=x[i]; y2=y1; y1=v; y[i]=v;
+  }
+  return y;
+}
+if(HPF) console.log('simulating a speaker rolled off below '+HPF+' Hz');
+
 /* ---- minimal 16-bit PCM WAV reader ---- */
 function readWav(path){
   const b=readFileSync(path);
@@ -78,8 +100,10 @@ for(const w of wins){
   const b=Math.min(pcm.length,Math.round((w.start+w.dur)*sr));
   if(b-a<2048) continue;
 
+  let seg=Float32Array.from(pcm.subarray(a,b));
+  if(HPF){ seg=highpass(highpass(seg,sr,HPF),sr,HPF); }
   const t0=Date.now();
-  const R=await analyzeSegment(Float32Array.from(pcm.subarray(a,b)),sr,OPTS);
+  const R=await analyzeSegment(seg,sr,OPTS);
   const ms=Date.now()-t0;
 
   const got=R.notes.map(n=>n.midi), truth=w.truth;

@@ -3,11 +3,19 @@ function med(buf,len){
   for(let i=1;i<len;i++){ const v=buf[i]; let j=i-1; while(j>=0&&buf[j]>v){buf[j+1]=buf[j];j--;} buf[j+1]=v; }
   return buf[len>>1];
 }
-/* HPSS via median filtering (Fitzgerald 2010) -> soft mask */
-function hpssMask(mag,frames,K,wT,wF){
+/* HPSS via median filtering (Fitzgerald 2010) -> soft mask
+
+   `check` is optional and exists only for cancellation: it is awaited every
+   so often so a caller that wants to abandon this run can say so and be
+   heard. Pass nothing — as the harness does — and not a single await is
+   entered, so the arithmetic and the cost are exactly what they were. */
+async function hpssMask(mag,frames,K,wT,wF,check){
   const H=new Float32Array(frames*K), P=new Float32Array(frames*K);
   const hT=wT>>1, hF=wF>>1, buf=new Float64Array(Math.max(wT,wF));
+  // the two median passes are the single most expensive thing the pipeline
+  // does, so they are where a cancel has to be able to land
   for(let k=0;k<K;k++){
+    if(check && (k&31)===0) await check();
     for(let t=0;t<frames;t++){
       let c=0;
       for(let d=-hT;d<=hT;d++){ const tt=t+d; if(tt>=0&&tt<frames) buf[c++]=mag[tt*K+k]; }
@@ -15,6 +23,7 @@ function hpssMask(mag,frames,K,wT,wF){
     }
   }
   for(let t=0;t<frames;t++){
+    if(check && (t&7)===0) await check();
     const o=t*K;
     for(let k=0;k<K;k++){
       let c=0;

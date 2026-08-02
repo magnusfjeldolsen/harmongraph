@@ -74,7 +74,7 @@ for(const seg of voiceCorpus(dur)){
   const truth=[...new Set([...seg.truthA,...seg.truthB])].sort((a,b)=>a-b);
   const cols=truth.map(m=>m-NOTE_LO).filter(i=>i>=0&&i<NN_COUNT);
   const {D}=buildDict(OPTS.a4,OPTS.decay,OPTS.fund);
-  const xo=cols.length? nnls(D,cols,R.yw,320,0.004) : [];
+  const xo=cols.length? await nnls(D,cols,R.yw,320,0.004) : [];
   const actO=new Float64Array(NN_COUNT);
   let mx=0; for(const v of xo) if(v>mx) mx=v;
   cols.forEach((c,i)=>{ actO[c]= mx>0 ? xo[i]/mx : 0; });

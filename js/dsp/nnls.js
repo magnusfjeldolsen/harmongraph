@@ -108,11 +108,17 @@ function buildDict(a4,s,fund=1){
   dict={D,fundBin}; dictKey=key; return dict;
 }
 
-/* ---------------- NNLS via FISTA + non-negative projection ---------------- */
-function nnls(D,cols,y,iters,l1){
+/* ---------------- NNLS via FISTA + non-negative projection ----------------
+   `check` is optional and exists only for cancellation: it is awaited every
+   so often so a caller that wants to abandon this run can say so and be
+   heard (see js/tick.js for why the loop has to yield at all). Pass nothing
+   — as the harness does — and no await is ever entered, so the arithmetic
+   and the cost are exactly what they were. */
+async function nnls(D,cols,y,iters,l1,check){
   const m=cols.length;
   const G=new Float64Array(m*m), b=new Float64Array(m);
   for(let i=0;i<m;i++){
+    if(check && (i&15)===0) await check();
     const ci=D[cols[i]];
     let s=0; for(let k=0;k<NB;k++) s+=ci[k]*y[k];
     b[i]=s;
@@ -134,6 +140,7 @@ function nnls(D,cols,y,iters,l1){
   L=Math.max(L,1e-9);
   let x=new Float64Array(m), z=new Float64Array(m), t=1;
   for(let it=0;it<iters;it++){
+    if(check && (it&31)===0) await check();
     const xn=new Float64Array(m);
     for(let i=0;i<m;i++){
       let g=0; for(let j=0;j<m;j++) g+=G[i*m+j]*z[j];

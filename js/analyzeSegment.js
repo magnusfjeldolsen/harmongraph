@@ -43,13 +43,24 @@ function selectNotes(detN,evid,thr,gate,nms,maxNotes){
 /* ---------------- the pipeline ----------------
    `onStage` is optional and only exists so the browser can paint a
    status line and yield to the event loop at exactly the points the
-   old analyze() did. Omit it and the function is straight-line. */
+   old analyze() did. Omit it and the function is straight-line.
+
+   `check` is the other optional hook, and it is the whole of what this
+   function knows about cancellation: an async callback that throws when
+   the caller has given up on this run. It is awaited at every stage
+   boundary and handed down to the two loops that dominate the runtime,
+   the HPSS median filters and the FISTA iterations. Omit it — as the
+   Node harness does — and nothing here changes at all: the pipeline
+   stays pure, DOM-free and importable in bare Node, which is the
+   property that made moving it into a worker tractable in the first
+   place. */
 async function analyzeSegment(sig,sr,opts={}){
   const {a4=440, fftN=16384, decay=0.72, hpss=true,
          thr=0.12, gate=0.08, nms=1.5, maxNotes=12, wfloor=0.3, fund=1,
-         onStage=null} = opts;
+         onStage=null, check=null} = opts;
   const stage = onStage ? (m=>onStage(m)) : null;
   const t0=now();
+  if(check) await check();
 
   // --- stage 1: fine STFT + HPSS ---
   const fn=4096, fh=2048;
@@ -57,14 +68,16 @@ async function analyzeSegment(sig,sr,opts={}){
   if(hpss && sig.length>fn*2){
     if(stage) await stage('Separating pitched from percussive …');
     Sf=stft(sig,fn,fh);
-    mask=hpssMask(magOf(Sf),Sf.frames,Sf.K,17,17);
+    mask=await hpssMask(magOf(Sf),Sf.frames,Sf.K,17,17,check);
     if(stage) await stage(null);
+    if(check) await check();
     harm=istft(applyMask(Sf,mask,false),sig.length);
     perc=istft(applyMask(Sf,mask,true),sig.length);
   }
 
   // --- stage 2: long STFT -> averaged magnitude ---
   if(stage) await stage('Transforming …');
+  if(check) await check();
   let n=fftN;
   while(n>harm.length && n>4096) n>>=1;
   const hop=Math.max(1024,n>>2);
@@ -75,15 +88,18 @@ async function analyzeSegment(sig,sr,opts={}){
 
   // --- stage 3: log-frequency + whitening ---
   if(stage) await stage('Mapping to semitone bins …');
+  if(check) await check();
   const yraw=logSpec(avg,sr,n,a4);
   const yw=whiten(yraw,wfloor);
 
   // --- stage 4: NNLS approximate transcription ---
   if(stage) await stage('Fitting 88 harmonic templates (NNLS) …');
+  if(check) await check();
   const {D,fundBin}=buildDict(a4,decay,fund);
   const allCols=[...Array(NN_COUNT).keys()];
-  const xdet=nnls(D,allCols,yw,320,0.004);
+  const xdet=await nnls(D,allCols,yw,320,0.004,check);
   if(stage) await stage(null);
+  if(check) await check();
 
   let xm=0; for(let i=0;i<NN_COUNT;i++) if(xdet[i]>xm) xm=xdet[i];
   const detN=new Float64Array(NN_COUNT);
@@ -102,7 +118,7 @@ async function analyzeSegment(sig,sr,opts={}){
 
   // --- stage 5: amplitudes on the un-whitened spectrum ---
   const cand=[]; for(let i=0;i<NN_COUNT;i++) if(detN[i]>0.03) cand.push(i);
-  const xampS = cand.length? nnls(D,cand,yraw,260,0) : [];
+  const xampS = cand.length? await nnls(D,cand,yraw,260,0,check) : [];
   const xamp=new Float64Array(NN_COUNT);
   cand.forEach((c,i)=>xamp[c]=xampS[i]);
 
@@ -124,6 +140,7 @@ async function analyzeSegment(sig,sr,opts={}){
   }
 
   // --- the note list, exactly as the Result panel builds it ---
+  if(check) await check();
   const keep=selectNotes(detN,evid,thr,gate,nms,maxNotes);
   let amx=0; keep.forEach(i=>{ if(xamp[i]>amx) amx=xamp[i]; });
   const notes=keep.map(i=>{

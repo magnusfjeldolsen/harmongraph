@@ -20,6 +20,7 @@ The app must be **served**, not opened from disk: ES modules are CORS-blocked on
 | `modularize` | Merged. Safe to delete. |
 | `harness` | Merged. Safe to delete. |
 | `assessment` | **Live WIP, not merged.** Interrupted mid-run. See below. |
+| `worker` | **Not merged.** DSP moved into an abortable module worker. See below. |
 
 ---
 
@@ -29,6 +30,7 @@ The app must be **served**, not opened from disk: ES modules are CORS-blocked on
 - **Mic capture rewritten.** Was `getUserMedia` → `MediaRecorder` → `Blob` → `decodeAudioData`, with `audio/mp4` first in the codec list, so any browser advertising MP4 encoded the take to AAC — lossy in exactly the high partials the NNLS fit reads. Now raw PCM through a `ScriptProcessor` straight into an `AudioBuffer`. Errors are also mapped to their real cause instead of one "Microphone blocked" string that hid five different failures.
 - **Pinch-zoom no longer destroys the fenced selection** (`js/main.js`). The first finger collapsed the fence assuming a new selection; a second finger flipped to pinch mode and skipped the repair.
 - **Note selection resets on a new analysis** (`js/analysis.js`, `js/audio.js`). `noteOn` was never cleared, so every analysis after the first inherited the previous chord's ticks; and the harmonic-comb isolation read it unfiltered, so it could mask for pitches the current fit never detected.
+- **DSP moved into a worker** (branch `worker`, not merged). A real module worker; the signal is transferred in and handed back on the result. Cancellation is cooperative — a generation token checked between stages and inside the FISTA and HPSS loops — so a cancelled run unwinds and the worker is reused, with `terminate()` only as a backstop. The Analyze button becomes Cancel while a run is in flight. A browser that blocks module workers falls back to the main-thread path. `node test/worker.mjs` covers the cancellation and stale-reply races; the harness reports `+0.000` on every metric. **Not verified in a real browser** — see the branch's own notes.
 - **Evaluation harness** — `node test/harness.mjs`, 132 chords (22 voicings × 6 timbres), zero dependencies, ~60 s, deterministic. Supports `--save`, `--compare <file>`, `--timbre`, `--voicing`, `--json`. `analyzeSegment()` was extracted as a pure DOM-free pipeline to make it possible; `analyze()` is now a thin wrapper.
 
 ## Baseline — measure every change against this

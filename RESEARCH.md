@@ -189,9 +189,13 @@ This matters more than people expect: historical recordings, wind bands and anyt
 
 ## 8. Performance architecture
 
-The prototype runs on the main thread with `await yield_()` between pipeline stages so the UI can repaint and show progress. At ~280 ms per analysis that's fine. If you extend it:
+The DSP runs in a **module worker** (`js/worker.js`, `new Worker(url,{type:'module'})` — no Blob-URL shim and no bundler; the app is already ES modules on a static host). The signal is transferred in and handed back out on the result, so nothing is copied and the page never ends up holding a detached buffer. The six progress stages that used to be `onStage` callbacks are now messages. `js/analysisRunner.js` owns the boundary: one generation id per run, replies from superseded runs dropped, and a ping probe before the worker is trusted, so a browser that blocks module workers falls back to the old main-thread path instead of breaking.
 
-- **Web Worker** for all DSP. Create from a Blob URL to stay single-file, or a real module in a bundled build. Transfer `Float32Array` buffers, don't copy.
+Cancellation is **cooperative, not `terminate()`**. A generation token is checked between stages and inside the two loops that dominate the runtime — the FISTA iterations in `nnls()` and the HPSS median filters — so a cancelled run unwinds through the ordinary error path and the worker survives with its FFT tables and note dictionary warm. `terminate()` is kept only as a backstop for a run that will not yield. The checking costs a yield, because the one way to signal a busy thread without yielding is a `SharedArrayBuffer` flag and that needs COOP/COEP headers Pages will not serve; see `js/tick.js` for why the yield is not simply `setTimeout(0)`.
+
+The pure pipeline knows none of this. `analyzeSegment()` takes an optional `check` callback and nothing else; omit it, as `test/harness.mjs` does, and not one `await` is entered.
+
+If you extend it further:
 - **AudioWorklet** if you ever want live/real-time analysis — it runs on the audio thread at 128-sample quanta. Note it cannot do a 16384-point FFT per quantum; you'd ring-buffer and analyze at hop intervals.
 - **WASM** for the hot loops. The NNLS Gram construction and the HPSS median filters are the two costs; both are trivially portable to Rust/C++. Probably 3–5× on the median filter.
 - **WebGPU** compute for the constant-Q transform if you go to a full CQT spectrogram view.
